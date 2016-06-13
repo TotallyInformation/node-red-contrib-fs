@@ -27,6 +27,7 @@ module.exports = function(RED) {
 
 		// copy "this" object in case we need it in context of callbacks of other functions.
 		var node = this
+		var msg = this
 
 		// send out the message to the rest of the workspace.
 		// ... this message will get sent at startup so you may not see it in a debug node.
@@ -34,7 +35,7 @@ module.exports = function(RED) {
 		//var msg = {};
 		//msg.topic = this.topic;
 		//msg.payload = "Hello world !"
-		//node.send(msg);
+		node.send(msg)
 
 		// respond to inputs....
 		node.on('input', function(msg) {
