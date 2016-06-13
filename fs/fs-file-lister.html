@@ -16,121 +16,104 @@
 
 <!-- This creates and configures the onscreen elements of the node           -->
 
-
-<!-- First, the content of the edit dialog is defined.                       -->
-<script type="text/x-red" data-template-name="fs-file-lister">
-    <!-- data-template-name identifies the node type this is for              -->
-
-    <!-- Each of the following divs creates a field in the edit dialog.       -->
-    <!-- Generally, there should be an input for each property of the node.   -->
-    <!-- The for and id attributes identify the corresponding property        -->
-    <!-- (with the 'node-input-' prefix).                                     -->
-    <!-- The available icon classes are defined Twitter Bootstrap glyphicons  -->
-
-    <!-- ** Unused templates for input types...
-    <div class="form-row">
-        <select id="node-input-action" style="width:95%; margin-right:5px;">
-        <option value="replace">Set the value of the message property</option>
-        <option value="change">Search/replace the value of the message property</option>
-        <option value="delete">Delete the message property</option>
-    </div>
-    </select>
-    <div class="form-row" id="node-reg-row">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-reg" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-reg" style="width: 70%;">Use regular expressions</label>
-    </div>
-    -->
-
-    <!-- START FOLDER -->
-    <div class="form-row">
-        <label for="node-input-start"><i class="fa fa-tasks"></i> Start Folder</label>
-        <input type="text" id="node-input-start" placeholder="Start Folder">
-    </div>
-
-    <!-- EXTENSION -->
-    <div class="form-row">
-        <label for="node-input-ext"><i class="fa fa-arrow-left"></i> Extension</label>
-        <input type="text" id="node-input-ext" style="width: 53%;" placeholder=".json">
-    </div>
-    <div class="form-row" id="node-reg-row">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-sub" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-sub" style="width: 70%;">Search sub-folders?</label>
-    </div>
-    <div class="form-tips">
-        Some info.
-    </div>
-    <!-- Output object -->
-    <div class="form-row">
-        <label for="node-input-output"><i class="fa fa-arrow-right"></i> Output <i>msg.</i></label>
-        <input type="text" id="node-input-output" style="width: 53%;" placeholder="payload">
-    </div>
-
-    <br/>
-    <!-- By convention, most nodes have a 'name' property. The following div -->
-    <!-- provides the necessary field. Should always be the last option      -->
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
+<script type="text/javascript">
+  RED.nodes.registerType('fs-file-lister',{
+    category: 'storage',      // the palette category
+    color: '#E6E0F8',
+    defaults: {               // defines the editable properties of the node
+      name: {value:""},     //  along with default values.
+      start: {value:""},    //, required:true}
+      ext: {value:""},
+      sub: {value:false}
+    },
+    inputs:1,               // set the number of inputs - only 0 or 1
+    outputs:1,              // set the number of outputs - 0 to n
+    // set the icon (held in icons dir below where you save the node)
+    icon: "file.png",     // saved in  icons/myicon.png
+    label: function() {     // sets the default label contents
+        return this.name||this.topic||"File Lister";
+    },
+    labelStyle: function() { // sets the class to apply to the label
+        return this.name?"node_label_italic":"";
+    }
+  })
 </script>
 
+<!-- First, the content of the edit dialog is defined.                       -->
+<!-- data-template-name identifies the node type this is for              -->
+<script type="text/x-red" data-template-name="fs-file-lister">
+  <div class="form-row">
+    <label for="node-input-start"><i class="fa fa-tasks"></i> Start Folder</label>
+    <input type="text" id="node-input-start" placeholder="Start Folder">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-ext"><i class="fa fa-arrow-left"></i> Extension</label>
+    <input type="text" id="node-input-ext" style="width: 53%;" placeholder=".json">
+  </div>
+
+  <div class="form-row" id="node-reg-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-sub" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-sub" style="width: 70%;">Search sub-folders?</label>
+  </div>
+
+  <div class="form-row" id="node-reg-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
+  </div>
+
+  <!-- By convention, most nodes have a 'name' property. The following div -->
+  <!-- provides the necessary field. Should always be the last option      -->
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
 
 <!-- Next, some simple help text is provided for the node.                   -->
 <!-- The first <p> is used as the pop-up tool tip when hovering over pallette -->
-<script type="text/x-red" data-help-name="moment">
-    <p>Format an input date-time message object.</p>
+<script type="text/x-red" data-help-name="fs-file-lister">
     <p>
-        <b>Input</b> must be either a JS datetime object or a <a href="http://momentjs.com/docs/#/parsing/">string that Moment.js can resolve to such</a>.
-        If the input is null, doesn not exist or is a blank string, the current Date/Time will be used. This can be used to add a current timestamp to a
-        flow of any kind easily.
+      Searches a folder (and optionally sub-folders) for files. optionally
+      may filter on a specific file extension.
     </p>
     <p>
-        <b>Output</b> is a formatted string or a Date object on <b>msg.payload</b> by default, change by setting the output field.
+      Returns a message for each file found.
     </p>
-    <p>Also adds msg.topic if specified otherwise passes it through.</p>
-    <p><b>Format</b> may be any <a href="http://momentjs.com/docs/#/displaying/format/">format string allowed by Moment.JS</a><br>
-    or one of the following (not case sensitive, alternatives in brackets):</p>
-    <dl>
-        <dt>If left blank</dt>
-        <dd>If the input is a Javascript Date object, output in ISO8601 format. If the input is a recognised date string, output a Javascript Date object</dd>
-        <dt>ISO8601 (ISO)</dt>
-        <dd>ISO 8602 format, e.g. "2015-01-28T16:24:48+00:00"<br>This is the default if the input is a Javascript Date object</dd>
-        <dt>date (jsDate)</dt>
-        <dd>a Javascript Date object<br>This is the default if the input is a recognised date string</dd>
-        <dt>fromNow (timeAgo)</dt>
-        <dd>e.g. 30 minutes ago</dd>
-        <dt>calendar (aroundNow)</dt>
-        <dd>e.g. "Last Monday", "Tomorrow 2:30pm"</dd>
-        <dt>duration</dt>
-        <dd>e.g. "8 minutes"</dd>
-    </dl>
+    <p>
+      Start folder refers to a folder on the filing system on the host running
+      Node-Red. The relative start position depends on how/where Node-Red is
+      installed so using an absolute path starting with / is advised.
+    </p>
 </script>
 
-<!-- Finally, the node type is registered along with all of its properties   -->
-<script type="text/javascript">
-    RED.nodes.registerType('moment',{
-        category: 'formats',      // the palette category
-        color: '#E6E0F8',
-        defaults: {               // defines the editable properties of the node
-            name: {value:""},     //  along with default values.
-            topic: {value:""},    //, required:true}
-            input: {value:"payload"},
-            format: {value:""},
-            locale: {value:""},
-            output: {value:"payload"},
-            fakeUTC: {value: false }
-        },
-        inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:1,              // set the number of outputs - 0 to n
-        // set the icon (held in icons dir below where you save the node)
-        icon: "timer.png",     // saved in  icons/myicon.png
-        label: function() {     // sets the default label contents
-            return this.name||this.topic||"Date/Time Formatter";
-        },
-        labelStyle: function() { // sets the class to apply to the label
-            return this.name?"node_label_italic":"";
-        }
-    });
-</script>
+
+<!-- Each of the following divs creates a field in the edit dialog.       -->
+<!-- Generally, there should be an input for each property of the node.   -->
+<!-- The for and id attributes identify the corresponding property        -->
+<!-- (with the 'node-input-' prefix).                                     -->
+<!-- The available icon classes are defined Twitter Bootstrap glyphicons  -->
+
+<!-- ** Unused templates for input types...
+<div class="form-row">
+    <select id="node-input-action" style="width:95%; margin-right:5px;">
+    <option value="replace">Set the value of the message property</option>
+    <option value="change">Search/replace the value of the message property</option>
+    <option value="delete">Delete the message property</option>
+</div>
+</select>
+<div class="form-row" id="node-reg-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-reg" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-reg" style="width: 70%;">Use regular expressions</label>
+</div>
+<div class="form-row">
+    <label for="node-input-start"><i class="fa fa-tasks"></i> Start Folder</label>
+    <input type="text" id="node-input-start" placeholder="Start Folder">
+</div>
+<div class="form-tips">
+    Some info.
+</div>
+-->
