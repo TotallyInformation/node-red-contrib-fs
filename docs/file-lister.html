@@ -1,66 +1,82 @@
-<h2>
-	Filing System Utilities: File Lister
-</h2>
-<h3>To Do</h3>
-<ul>
-	<li>
-		Implement the subfolder processing
-	</li>
-	<li>
-		Implement the Single message output option.
-	</li>
-</ul>
-<h3>What does this node do?</h3>
-<p>
-	This node searches a folder (and optionally sub-folders) for files. optionally
-	may filter on a specific file extension.
-</p>
-<p>
-	The folder and files come from the computer and operating dystem that is
-	running Node-Red.
-</p>
-<h3>Outputs</h3>
-<p>
-	By default, returns one message for each file found. The filename will be
-	in the msg.payload.
-	 unless the <i>Output Single Message</i>
-	option is chosen.
-</p>
-<p>
-	If the <i>Output Single Message</i> option is chosen, the msg.payload will
-	contain an <i>array</i> of filenames.
-</p>
-<p>
-	Output filenames will contain the full file path if the <i>Full Path</i>
-	option is selected.
-</p>
-<h3>Inputs</h3>
-<ul>
-	<li>
-		<b>Start Folder</b> String containing the start folder location to search
-		for files. Without a leading '/', will search from the location the node
-		is installed which is not terribly useful so it is preferred to use
-		absolute paths. e.g. /home/pi<br />
-		Windows path names are also accepted. On Windows, you can use either form.
-		There is no need to escape backslashes.
-	</li>
-	<li>
-		<b>Extension</b> String that will be matched to the <i>end</i> of any
-		filenames found. Filenames <i>not</i> matching will be filtered out.
-		Defaults to '.json', leave blank to get all files.
-	</li>
-	<li>
-		<b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
-		start folder will also be searched.
-	</li>
-	<li>
-		<b>Include full path in output</b> Checkbox. If selected (the default),
-		the output payload will have the folder path prepended to the filename.
-	</li>
-	<li>
-		<b>Single</b> Checkbox. If selected, only one msg will be sent; the
-		msg.payload will contain an array of filenames.<br />
-		Otherwise, the default output is a single msg for each file found with
-		the msg.payload a string containing the filename.
-	</li>
-</ul>
+<html>
+<body>
+	<h2>
+		Filing System Utilities: File Lister
+	</h2>
+	<h3>To Do</h3>
+	<ul>
+		<li>
+			Allow other overrides to be passed in.
+		</li>
+	</ul>
+	<h3>What does this node do?</h3>
+	<p>
+		This node searches a folder (and optionally sub-folders) for files. optionally
+		may filter on a specific file pattern.
+	</p>
+	<p>
+		The folder and files come from the computer and operating system that is
+		running Node-Red. AKA, the "host".
+	</p>
+	<h3>Outputs</h3>
+	<p>
+		By default, returns one message for each file found. The filename will be
+		in the msg.payload.
+		 unless the <i>Output Single Message</i>
+		option is chosen.
+	</p>
+	<p>
+		If the <i>Output Single Message</i> option is chosen, the msg.payload will
+		contain an <i>array</i> of filenames.
+	</p>
+	<p>
+		Output filenames will contain the full file path if the <i>Full Path</i>
+		option is selected.
+	</p>
+	<p>
+		If the "Return file details" option is selected, each file output will be
+		an object. {"name":[filename], "stat": {"size":[fsize], ...}}
+	</p>
+	<h3>Inputs</h3>
+	<ul>
+		<li>
+			<b>Start Folder</b> [start] String containing the start folder location to search
+			for files. Without a leading '/', will search from the location the node
+			is installed which is not terribly useful so it is preferred to use
+			absolute paths. e.g. /home/pi<br />
+			Windows path names are also accepted. On Windows, you can use either form.
+			There is no need to escape backslashes.
+			Max path length is 1024
+		</li>
+		<li>
+			<b>File Pattern</b> [pattern] String that will be matched against the filenames.
+			Standard "glob" file patterns are allowed. Defaults to '*' which will return all files.
+			Max length is 1024
+		</li>
+		<li>
+			<b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
+			start folder will also be searched.
+		</li>
+		<li>
+			<b>Sub-folder Depth</b> Integer. Default 0 only searches the start folder.
+			Limits the depth of sub-folders that will be searched.
+		</li>
+		<li>
+			<b>Include full path in output</b> Checkbox. If selected (the default),
+			the output payload will have the folder path prepended to the filename.
+		</li>
+		<li>
+			<b>Single</b> Checkbox. If selected, only one msg will be sent; the
+			msg.payload will contain an array of filenames.<br />
+			Otherwise, the default output is a single msg for each file found with
+			the msg.payload a string containing the filename.
+		</li>
+	</ul>
+	<p>
+		To override the configured options, pass in a msg with msg.payload like:
+		<code>{"start":"/my/folder","pattern":"*.json"}</code>
+		Any missing options will be picked up from the configured node. Only those 2
+		overrides are currently available.
+	</p>
+</body>
+</html>

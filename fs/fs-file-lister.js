@@ -16,15 +16,18 @@
 
 // Node for Node-Red that lists all files from a given start folder
 // with an optionally specified file extension.
+//var fs = require('fs')
+var path = require('path')
+var readdirp = require('readdirp')
+
+// Module name must match this nodes html file
+var moduleName = 'fs-file-lister'
 
 module.exports = function(RED) {
 	'use strict'
 
-	var fs = require('fs')
-	var path = require('path')
-
 	// The main node definition - most things happen in here
-	function fsFileLister(config) {
+	function nodeGo(config) {
 		// Create a RED node
 		RED.nodes.createNode(this, config)
 
@@ -32,16 +35,18 @@ module.exports = function(RED) {
 		var node = this
 
 		// Store local copies of the node configuration (as defined in the .html)
-		node.topic = config.topic
-		node.start = config.start
-		node.ext   = config.ext
-		node.sub   = config.sub
-		node.path  = config.path
-		node.single= config.single
+		node.topic    = config.topic
+		node.name     = config.name
+		node.start    = config.start
+		node.pattern  = config.pattern
+		node.path     = config.path
+		node.single   = config.single
+		node.depth    = config.depth
+		node.stat     = config.stat
 
 		// Make sure the parameters are strings
-		if ( (typeof node.start !== 'string') || (typeof node.ext !== 'string') ) {
-			node.error('Either Folder or Ext is not a string, cannot process. Folder: ' + node.start + ', Ext: ' + node.ext)
+		if ( (typeof node.start !== 'string') || (typeof node.pattern !== 'string') ) {
+			node.error('Either Folder or Ext is not a string, cannot process. Folder: ' + node.start + ', Pattern: ' + node.ext)
 			return
 		}
 
@@ -54,12 +59,91 @@ module.exports = function(RED) {
 			// Output the nodes config
 			msg.config = {
 				'start': node.start,
-				'ext': node.ext,
-				'sub': node.sub,
+				'pattern': node.pattern,
 				'path': node.path,
-				'single': node.single
+				'single': node.single,
+				'depth': node.depth,
+				'stat': node.stat
 			}
 
+			// override config if passed suitable payload
+			if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
+				if ( validFolderName(msg.payload.start) ) {
+					node.start = msg.payload.start
+				}
+			}
+			if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
+				if ( (typeof msg.payload.pattern === 'string') && (msg.payload.pattern.length < 1024) ) {
+					node.pattern = msg.payload.pattern
+				}
+			}
+
+			// Keep count of files found
+			var totalFiles = 0
+
+			var options = {}
+			options.root = path.join(node.start),
+			options.fileFilter = node.pattern
+			options.entryType = 'files'
+			if ( node.depth > -1 ) {
+				options.depth = Number(node.depth)
+			}
+
+			var arrayOut = []
+
+			// Recursively read the folder using the stream API
+			readdirp(options)
+				// Called if a found entry cannot be accessed (e.g. permissions)
+				.on('warn', function (err) {
+					node.warn('File could not be accessed', err)
+				})
+				// Fatal error
+				.on('error', function (err) {
+					node.error('Error processing folder listing', err)
+				})
+				// called for each entry found
+				.on('data', function (entry) {
+					var file = entry.name
+					// Do we want just the file name output or the full path?
+					if ( node.path ) {
+						file = entry.fullPath
+					}
+					// Do we want to include file stats?
+					if ( node.stat ) {
+						file = {name: file}
+						file.stat = {
+							size: entry.stat.size,
+							created: entry.stat.ctime,
+							changed: entry.stat.mtime,
+							accessed: entry.stat.atime,
+							uid: entry.stat.uid,
+							gid: entry.stat.gid,
+							mode: '0x' + entry.stat.mode.toString(16)
+						}
+					}
+					// If only single output
+					if ( node.single ) {
+						// accumulate the output array (send later on end)
+						arrayOut.push(file)
+					} else {
+						// or send each file as separate msg
+						node.status({fill:'green',shape:'dot',text:'# files ' + ++totalFiles})
+						msg.payload = file
+						//msg.debug = entry
+						node.send( msg )
+					}
+				})
+				// called when all entries have been output
+				.on('end', function () {
+					// Send a single msg if arrayOut contains anything
+					if ( arrayOut.length > 0 ) {
+						node.status({fill:'blue',shape:'dot',text:'# files ' + arrayOut.length})
+						msg.payload = arrayOut
+						node.send(msg)
+					}
+				})
+
+			/*
 			// Async read the folder
 			fs.readdir(node.start, function (err, files) {
 				if (err) {
@@ -67,7 +151,8 @@ module.exports = function(RED) {
 					return
 				}
 
-				node.log('Total # files: ' + files.length)
+				totalFiles = files.length
+				node.status({fill:'blue',shape:'dot',text:filteredFiles + '/' + totalFiles})
 
 				var arrayOut = []
 
@@ -107,19 +192,33 @@ module.exports = function(RED) {
 				}
 
 			}) // --- End of readdir callback --- //
+			*/
 
 		}) // --- End of node input fn --- //
 
 		// Tidy up if we need to
-		//node.on("close", function() {
-		// Called when the node is shutdown - eg on redeploy.
-		// Allows ports to be closed, connections dropped etc.
-		// eg: node.client.disconnect();
+			//node.on("close", function() {
+			// Called when the node is shutdown - eg on redeploy.
+			// Allows ports to be closed, connections dropped etc.
+			// eg: node.client.disconnect();
 		//});
 
 	} // --- End of fnFileLister --- //
 
+	// Check if a folder name is safe
+	function validFolderName(folder) {
+		var isValid = true
+		if ( typeof folder !== 'string' ) {
+			isValid = false
+		} else {
+			if ( folder.length > 1023 ) {
+				isValid = false
+			}
+		}
+		return isValid
+	} // --- End of validFolderName function --- //
+
 	// Register the node by name. This must be called before overriding any of the
 	// Node functions.
-	RED.nodes.registerType('fs-file-lister', fsFileLister)
+	RED.nodes.registerType(moduleName, nodeGo)
 } // ---- End of Mobule ---- //

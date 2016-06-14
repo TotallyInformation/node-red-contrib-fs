@@ -17,21 +17,16 @@
 <!-- This creates and configures the onscreen elements of the node           -->
 
 <script type="text/javascript">
-  // Module name must match this nodes html file
-  // Use the same name in the data-template-name entries
-  var moduleName = 'fs-file-lister'
-
-  RED.nodes.registerType(moduleName,{
+  RED.nodes.registerType('fs-file-lister',{
     category: 'storage',      // the palette category
     color: '#E6E0F8',
-    defaults: { // defines the editable properties of the node
-      name:    {value:''},    //  along with default values.
-      start:   {value:'/', required:true},   // Start folder
-      pattern: {value:'*'},   // Extension (optional)
-      path:    {value:true},  // Output full path?
-      single:  {value:false}, // Output a single array instead of multiple messages
-      depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
-      stat:    {value:false}, // If true, return file meta-data
+    defaults: {               // defines the editable properties of the node
+      name:   {value:''},     //  along with default values.
+      start:  {value:'/'},    // Start folder
+      ext:    {value:'.json'},// Extension (optional)
+      sub:    {value:false},  // Check sub-folders too?
+      path:   {value:true},   // Output full path?
+      single: {value:false}   // Out a single array instead of multiple messages
     },
     inputs:1,               // set the number of inputs - only 0 or 1
     outputs:1,              // set the number of outputs - 0 to n
@@ -49,14 +44,14 @@
 <!-- First, the content of the edit dialog is defined.                       -->
 <!-- data-template-name identifies the node type this is for              -->
 <script type="text/x-red" data-template-name="fs-file-lister">
-  <div class="form-row" title="Start (root) folder for search">
-    <label for="node-input-start"><i class="fa fa-folder"></i> Start Folder</label>
+  <div class="form-row">
+    <label for="node-input-start"><i class="fa fa-tasks"></i> Start Folder</label>
     <input type="text" id="node-input-start" placeholder="Start Folder">
   </div>
 
   <div class="form-row">
-    <label for="node-input-pattern"><i class="fa fa-file-code-o"></i> File Pattern</label>
-    <input type="text" id="node-input-pattern" placeholder="*">
+    <label for="node-input-ext"><i class="fa fa-arrow-left"></i> Extension</label>
+    <input type="text" id="node-input-ext" style="width: 53%;" placeholder=".json">
   </div>
 
   <div class="form-row" id="node-reg-row">
@@ -71,18 +66,14 @@
     <label for="node-input-single" style="width: 70%;">Output single message (array)?</label>
   </div>
 
-  <div class="form-row" title="Set to >0 to search sub-folders.">
-    <label for="node-input-depth"><i class="fa fa-level-down"></i> Max. search depth</label>
-    <input type="text" id="node-input-depth" placeholder="0 = no recursion">
-  </div>
-
   <div class="form-row" id="node-reg-row">
     <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-stat" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-stat" style="width: 70%;">Return file details?</label>
+    <input type="checkbox" id="node-input-sub" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-sub" style="width: 70%;">Search sub-folders? (Not yet working)</label>
   </div>
 
-  <!-- Most nodes have a 'name' property. Should always be the last option -->
+  <!-- By convention, most nodes have a 'name' property. The following div -->
+  <!-- provides the necessary field. Should always be the last option      -->
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
@@ -95,20 +86,27 @@
     <h2>
       Filing System Utilities: File Lister
     </h2>
+    <p><b>**WARNING** This node *will* get replaced. The new node will have the same name but different parameters. This needs a different library & will be in the live release.</b></p>
     <h3>To Do</h3>
     <ul>
       <li>
-        Allow other overrides to be passed in.
+        Implement the subfolder processing
+      </li>
+      <li>
+        Replace raw fs module with a better module that can recurse and use wildcards (globbing)
+      </li>
+      <li>
+        Allow inputs from recieved msg
       </li>
     </ul>
     <h3>What does this node do?</h3>
     <p>
       This node searches a folder (and optionally sub-folders) for files. optionally
-      may filter on a specific file pattern.
+      may filter on a specific file extension.
     </p>
     <p>
-      The folder and files come from the computer and operating system that is
-      running Node-Red. AKA, the "host".
+      The folder and files come from the computer and operating dystem that is
+      running Node-Red.
     </p>
     <h3>Outputs</h3>
     <p>
@@ -125,33 +123,24 @@
       Output filenames will contain the full file path if the <i>Full Path</i>
       option is selected.
     </p>
-    <p>
-      If the "Return file details" option is selected, each file output will be
-      an object. {"name":[filename], "stat": {"size":[fsize], ...}}
-    </p>
     <h3>Inputs</h3>
     <ul>
       <li>
-        <b>Start Folder</b> [start] String containing the start folder location to search
+        <b>Start Folder</b> String containing the start folder location to search
         for files. Without a leading '/', will search from the location the node
         is installed which is not terribly useful so it is preferred to use
         absolute paths. e.g. /home/pi<br />
         Windows path names are also accepted. On Windows, you can use either form.
         There is no need to escape backslashes.
-        Max path length is 1024
       </li>
       <li>
-        <b>File Pattern</b> [pattern] String that will be matched against the filenames.
-        Standard "glob" file patterns are allowed. Defaults to '*' which will return all files.
-        Max length is 1024
+        <b>Extension</b> String that will be matched to the <i>end</i> of any
+        filenames found. Filenames <i>not</i> matching will be filtered out.
+        Defaults to '.json', leave blank to get all files.
       </li>
       <li>
         <b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
         start folder will also be searched.
-      </li>
-      <li>
-        <b>Sub-folder Depth</b> Integer. Default 0 only searches the start folder.
-        Limits the depth of sub-folders that will be searched.
       </li>
       <li>
         <b>Include full path in output</b> Checkbox. If selected (the default),
@@ -164,12 +153,6 @@
         the msg.payload a string containing the filename.
       </li>
     </ul>
-    <p>
-      To override the configured options, pass in a msg with msg.payload like:
-      <code>{"start":"/my/folder","pattern":"*.json"}</code>
-      Any missing options will be picked up from the configured node. Only those 2
-      overrides are currently available.
-    </p>
 </script>
 
 

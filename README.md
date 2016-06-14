@@ -1,8 +1,8 @@
 # node-red-contrib-fs
-[Node-Red](http://nodered.org) Node that works with the host filing system.
+[Node-Red](http://nodered.org) nodes that work with the host filing system.
 
 #Nodes
-- [file-lister](docs/file-lister.html) - List all files in a given starting folder **WARNING** This node *will* get replaced. The new node will have the same name but different parameters. This needs a different library & will be in the live release.
+- [file-lister](docs/file-lister.html) - List all files in a given starting folder optionally with a filename filter pattern. Also has options for file details and sub-folder recursion.
 
 #Install
 
@@ -15,13 +15,17 @@ While in development, install with:
     npm install https://github.com/TotallyInformation/node-red-contrib-fs/tarball/master
 
 #Updates
-0.0.9 - Initial release - File lister. 2016-06-14
+- 0.0.9 - Initial release - File lister. 2016-06-14
+- 1.0.0 - Reworked File lister, more options. 2016-06-14
 
-#Usage
-
+#Depends On
+- [readdirp](https://github.com/thlorenz/readdirp)
 
 #To Do
+- Add additional input overrides to file lister
+- Additional nodes: Create/Move/Delete file/folder
 
+If you have other ideas for filing system related nodes, please [raise an issue](https://github.com/TotallyInformation/node-red-contrib-fs/issues).
 
 #License
 
