@@ -20,6 +20,9 @@
 module.exports = function(RED) {
 	'use strict'
 
+	var fs = require('fs')
+	var path = require('path')
+
 	// The main node definition - most things happen in here
 	function fsFileLister(config) {
 		// Create a RED node
@@ -27,22 +30,57 @@ module.exports = function(RED) {
 
 		// copy "this" object in case we need it in context of callbacks of other functions.
 		var node = this
-		var msg = this
 
-		// send out the message to the rest of the workspace.
-		// ... this message will get sent at startup so you may not see it in a debug node.
-		// Define OUTPUT msg...
-		//var msg = {};
-		//msg.topic = this.topic;
-		//msg.payload = "Hello world !"
-		node.send(msg)
+		// Store local copies of the node configuration (as defined in the .html)
+		node.topic = config.topic
+		node.start = config.start
+		node.ext   = config.ext
+		node.sub   = config.sub
+		node.path  = config.path
+		node.single= config.single
+
+		// Make sure the parameters are strings
+		if ( (typeof node.start !== 'string') || (typeof node.ext !== 'string') ) {
+			node.error('Either Folder or Ext is not a string, cannot process. Folder: ' + node.start + ', Ext: ' + extension, err)
+			return
+		}
 
 		// respond to inputs....
 		node.on('input', function(msg) {
       // processing goes here ...
+			msg.payload = node
+
+			fs.readdir(node.start, function (err, files) {
+				if (err) {
+					node.error('Oops! Folder does not exist: ' + node.start, err)
+					return
+				}
+
+				node.log('# files: ' + files.length)
+
+				// Any error in here will crash Node-Red!! So catch them instead
+				try {
+					files
+						// calls the given callback func for each file, will only pass names where fn returns true
+						.filter( function (file) {
+							var len = node.ext.length
+							if (len === 0) return true
+							// Returns TRUE only if the file name ends in the given extension
+							return file.substr(0-len) === node.ext
+						})
+						.forEach( function (file) {
+							if ( node.)
+							msg.payload = path.join(node.start, file)
+							node.send( msg )
+						})
+				} catch (err) {
+					node.error('Ouch! Something went badly wrong processing the files list', err)
+					return
+				}
+			})
 
       // Finally send on the msg
-			node.send(msg)
+			//node.send(msg)
 		})
 
 		// Tidy up if we need to

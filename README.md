@@ -2,7 +2,7 @@
 [Node-Red](http://nodered.org) Node that works with the host filing system.
 
 #Nodes
-- file-lister - List all files in a given starting folder
+- [file-lister](docs/filelister.html) - List all files in a given starting folder
 
 #Install
 
@@ -15,7 +15,7 @@ While in development, install with:
     npm install https://github.com/TotallyInformation/node-red-contrib-fs/tarball/master
 
 #Updates
-1.0.0 - Initial release. 2016-06-12
+0.0.8 - Initial release - File lister. 2016-06-14
 
 #Usage
 

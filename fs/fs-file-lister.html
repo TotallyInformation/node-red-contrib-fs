@@ -21,10 +21,12 @@
     category: 'storage',      // the palette category
     color: '#E6E0F8',
     defaults: {               // defines the editable properties of the node
-      name: {value:''},     //  along with default values.
-      start: {value:'/'},    //, required:true}
-      ext: {value:'.json'},
-      sub: {value:false}
+      name:   {value:''},     //  along with default values.
+      start:  {value:'/'},    // Start folder
+      ext:    {value:'.json'},// Extension (optional)
+      sub:    {value:false},  // Check sub-folders too?
+      path:   {value:true},   // Output full path?
+      single: {value:false}   // Out a single array instead of multiple messages
     },
     inputs:1,               // set the number of inputs - only 0 or 1
     outputs:1,              // set the number of outputs - 0 to n
@@ -54,14 +56,20 @@
 
   <div class="form-row" id="node-reg-row">
     <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-sub" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-sub" style="width: 70%;">Search sub-folders?</label>
+    <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
   </div>
 
   <div class="form-row" id="node-reg-row">
     <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
+    <input type="checkbox" id="node-input-sub" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-sub" style="width: 70%;">Search sub-folders? (Not yet working)</label>
+  </div>
+
+  <div class="form-row" id="node-reg-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-single" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-single" style="width: 70%;">Output single message (array)? (Not yet working)</label>
   </div>
 
   <!-- By convention, most nodes have a 'name' property. The following div -->
@@ -75,18 +83,71 @@
 <!-- Next, some simple help text is provided for the node.                   -->
 <!-- The first <p> is used as the pop-up tool tip when hovering over pallette -->
 <script type="text/x-red" data-help-name="fs-file-lister">
+    <h1>
+      Filing System Utilities: File Lister
+    </h1>
+    <h2>To Do</h2>
+    <ul>
+      <li>
+        Implement the subfolder processing
+      </li>
+      <li>
+        Implement the Single message output option.
+      </li>
+    </ul>
     <p>
-      Searches a folder (and optionally sub-folders) for files. optionally
+      This node searches a folder (and optionally sub-folders) for files. optionally
       may filter on a specific file extension.
     </p>
     <p>
-      Returns a message for each file found.
+      The folder and files come from the computer and operating dystem that is
+      running Node-Red.
+    </p>
+    <h2>Outputs</h2>
+    <p>
+      By default, returns one message for each file found. The filename will be
+      in the msg.payload.
+       unless the <i>Output Single Message</i>
+      option is chosen.
     </p>
     <p>
-      Start folder refers to a folder on the filing system on the host running
-      Node-Red. The relative start position depends on how/where Node-Red is
-      installed so using an absolute path starting with / is advised.
+      If the <i>Output Single Message</i> option is chosen, the msg.payload will
+      contain an <i>array</i> of filenames.
     </p>
+    <p>
+      Output filenames will contain the full file path if the <i>Full Path</i>
+      option is selected.
+    </p>
+    <h2>Inputs</h2>
+    <ul>
+      <li>
+        <b>Start Folder</b> String containing the start folder location to search
+        for files. Without a leading '/', will search from the location the node
+        is installed which is not terribly useful so it is preferred to use
+        absolute paths. e.g. /home/pi<br />
+        Windows path names are also accepted. On Windows, you can use either form.
+        There is no need to escape backslashes.
+      </li>
+      <li>
+        <b>Extension</b> String that will be matched to the <i>end</i> of any
+        filenames found. Filenames <i>not</i> matching will be filtered out.
+        Defaults to '.json', leave blank to get all files.
+      </li>
+      <li>
+        <b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
+        start folder will also be searched.
+      </li>
+      <li>
+        <b>Include full path in output</b> Checkbox. If selected (the default),
+        the output payload will have the folder path prepended to the filename.
+      </li>
+      <li>
+        <b>Single</b> Checkbox. If selected, only one msg will be sent; the
+        msg.payload will contain an array of filenames.<br />
+        Otherwise, the default output is a single msg for each file found with
+        the msg.payload a string containing the filename.
+      </li>
+    </ul>
 </script>
 
 
