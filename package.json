@@ -20,13 +20,13 @@
   "main": "fs/fs.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/totallyinformation/node-red-contrib-moment"
+    "url": "https://github.com/totallyinformation/node-red-contrib-fs"
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/totallyinformation/node-red-contrib-moment/issues"
+    "url": "https://github.com/totallyinformation/node-red-contrib-fs/issues"
   },
-  "homepage": "https://github.com/totallyinformation/node-red-contrib-moment",
+  "homepage": "https://github.com/totallyinformation/node-red-contrib-fs",
   "scripts": {},
   "directories": {},
   "dependencies": {
