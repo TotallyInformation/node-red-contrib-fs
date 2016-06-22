@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-fs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Node-Red Node that handles the host filing system.",
   "dependencies": {
   },
@@ -8,7 +8,9 @@
     "name" : "Julian Knight",
     "url" : "https://github.com/totallyinformation"
   },
-  "contributors": [],
+  "contributors": [
+    {"name": "Andreas Brain", "url": "https://github.com/abrain"}
+  ],
   "keywords": [
     "node-red", "fs", "files", "folders"
   ],

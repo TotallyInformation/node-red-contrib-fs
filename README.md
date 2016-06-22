@@ -3,6 +3,7 @@
 
 #Nodes
 - [file-lister](docs/file-lister.html) - List all files in a given starting folder optionally with a filename filter pattern. Also has options for file details and sub-folder recursion.
+- file-copier - In progress. Simple node to copy files (optionally with wildcard specifications).
 
 #Install
 
@@ -17,6 +18,7 @@ While in development, install with:
 #Updates
 - 0.0.9 - Initial release - File lister. 2016-06-14
 - 1.0.0 - Reworked File lister, more options. 2016-06-14
+- 1.0.1 - Fix from [Andreas Brain](https://github.com/abrain) correcting URLs in package.json. 2016-06-22
 
 #Depends On
 - [readdirp](https://github.com/thlorenz/readdirp)
