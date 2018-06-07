@@ -28,6 +28,7 @@
       name:    {value:''},    //  along with default values.
       start:   {value:'/', required:true},   // Start folder
       pattern: {value:'*'},   // Extension (optional)
+      hidden:  {value:false}, // include hidden files
       path:    {value:true},  // Output full path?
       single:  {value:false}, // Output a single array instead of multiple messages
       depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
@@ -57,6 +58,12 @@
   <div class="form-row">
     <label for="node-input-pattern"><i class="fa fa-file-code-o"></i> File Pattern</label>
     <input type="text" id="node-input-pattern" placeholder="*">
+  </div>
+
+  <div class="form-row" id="node-reg-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
   </div>
 
   <div class="form-row" id="node-reg-row">
@@ -120,6 +127,10 @@
     <p>
       If the <i>Output Single Message</i> option is chosen, the msg.payload will
       contain an <i>array</i> of filenames.
+    </p>
+    <p>
+      If the <i>Show Hidden files</i> option is chosen, the msg.payload will
+      include any hidden filenames.
     </p>
     <p>
       Output filenames will contain the full file path if the <i>Full Path</i>
