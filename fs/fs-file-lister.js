@@ -39,6 +39,7 @@ module.exports = function(RED) {
 		node.name     = config.name
 		node.start    = config.start
 		node.pattern  = config.pattern
+		node.hidden   = config.hidden
 		node.path     = config.path
 		node.single   = config.single
 		node.depth    = config.depth
@@ -60,6 +61,7 @@ module.exports = function(RED) {
 			msg.config = {
 				'start': node.start,
 				'pattern': node.pattern,
+				'hidden': node.hidden,
 				'path': node.path,
 				'single': node.single,
 				'depth': node.depth,
@@ -104,6 +106,8 @@ module.exports = function(RED) {
 				// called for each entry found
 				.on('data', function (entry) {
 					var file = entry.name
+					// see if we should include hidden files and if this is a hidden file
+					if (!node.hidden && (file.charAt(0) == ".")) {return;}
 					// Do we want just the file name output or the full path?
 					if ( node.path ) {
 						file = entry.fullPath
