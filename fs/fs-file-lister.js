@@ -139,8 +139,11 @@ module.exports = function(RED) {
 					if ( arrayOut.length > 0 ) {
 						node.status({fill:'blue',shape:'dot',text:'# files ' + arrayOut.length})
 						msg.payload = arrayOut
-						node.send(msg)
+					} else {
+						node.status({fill:'red',shape:'dot',text:'No files found.'})
+                                                msg.payload = []
 					}
+					node.send(msg)
 				})
 
 			/*
