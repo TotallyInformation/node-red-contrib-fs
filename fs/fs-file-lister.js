@@ -53,11 +53,12 @@ module.exports = function(RED) {
 		// respond to inputs....
 		node.on('input', function(msg) {
 
+			var clonedMsg = RED.util.cloneMessage(msg);
 			// Keep the original topic and payload
-			msg.topic = msg.topic
-			msg.origPayload = msg.payload
+			clonedMsg.topic = msg.topic
+			clonedMsg.origPayload = msg.payload
 			// Output the nodes config
-			msg.config = {
+			clonedMsg.config = {
 				'start': node.start,
 				'pattern': node.pattern,
 				'path': node.path,
@@ -128,9 +129,13 @@ module.exports = function(RED) {
 					} else {
 						// or send each file as separate msg
 						node.status({fill:'green',shape:'dot',text:'# files ' + ++totalFiles})
-						msg.payload = file
-						//msg.debug = entry
-						node.send( msg )
+						node.send({
+							topic: clonedMsg.topic,
+							origPayload: clonedMsg.origPayload,
+							config: clonedMsg.config,
+							payload: file,
+							// debug: entry
+						})
 					}
 				})
 				// called when all entries have been output
@@ -138,8 +143,8 @@ module.exports = function(RED) {
 					// Send a single msg if arrayOut contains anything
 					if ( arrayOut.length > 0 ) {
 						node.status({fill:'blue',shape:'dot',text:'# files ' + arrayOut.length})
-						msg.payload = arrayOut
-						node.send(msg)
+						clonedMsg.payload = arrayOut
+						node.send(clonedMsg)
 					}
 				})
 
