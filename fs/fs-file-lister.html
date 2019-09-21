@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2015 Julian Knight (Totally Information)
+  Copyright (c) 2019 Julian Knight (Totally Information)
 
   Licensed under the Apache License, Version 2.0 (the 'License');
   you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
       name:    {value:''},    //  along with default values.
       start:   {value:'/', required:true},   // Start folder
       pattern: {value:'*'},   // Extension (optional)
+      hidden:  {value:true}, // include hidden files (@since v1.0.2)
       path:    {value:true},  // Output full path?
       single:  {value:false}, // Output a single array instead of multiple messages
       depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
@@ -42,7 +43,16 @@
     },
     labelStyle: function() { // sets the class to apply to the label
         return this.name ? 'node_label_italic' : '';
-    }
+    },
+    oneditprepare: function () {
+        if ( this.hidden === undefined ) this.hidden = true
+        //#region Set the checkbox states
+        $('#node-input-hidden').prop('checked', this.hidden)
+        $('#node-input-path').prop('checked', this.path)
+        $('#node-input-single').prop('checked', this.single)
+        $('#node-input-stat').prop('checked', this.stat)
+        //#endregion checkbox states
+    },
   })
 </script>
 
@@ -59,13 +69,19 @@
     <input type="text" id="node-input-pattern" placeholder="*">
   </div>
 
-  <div class="form-row" id="node-reg-row">
+  <div class="form-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
+  </div>
+
+  <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
   </div>
 
-  <div class="form-row" id="node-reg-row">
+  <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-single" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-single" style="width: 70%;">Output single message (array)?</label>
@@ -76,7 +92,7 @@
     <input type="text" id="node-input-depth" placeholder="0 = no recursion">
   </div>
 
-  <div class="form-row" id="node-reg-row">
+  <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-stat" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-stat" style="width: 70%;">Return file details?</label>
@@ -154,6 +170,11 @@
         Limits the depth of sub-folders that will be searched.
       </li>
       <li>
+        <b>Show Hidden files</b> checkbox. If selected (default) the msg.payload will
+        include any hidden file-/folder-names. Deselect to include them. Note that Windows
+        hidden files/folders are not effected unless they start with a dot.
+      </li>
+      <li>
         <b>Include full path in output</b> Checkbox. If selected (the default),
         the output payload will have the folder path prepended to the filename.
       </li>
@@ -171,32 +192,3 @@
       overrides are currently available.
     </p>
 </script>
-
-
-<!-- Each of the following divs creates a field in the edit dialog.       -->
-<!-- Generally, there should be an input for each property of the node.   -->
-<!-- The for and id attributes identify the corresponding property        -->
-<!-- (with the 'node-input-' prefix).                                     -->
-<!-- The available icon classes are defined Twitter Bootstrap glyphicons  -->
-
-<!-- ** Unused templates for input types...
-<div class="form-row">
-    <select id="node-input-action" style="width:95%; margin-right:5px;">
-    <option value="replace">Set the value of the message property</option>
-    <option value="change">Search/replace the value of the message property</option>
-    <option value="delete">Delete the message property</option>
-</div>
-</select>
-<div class="form-row" id="node-reg-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-reg" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-reg" style="width: 70%;">Use regular expressions</label>
-</div>
-<div class="form-row">
-    <label for="node-input-start"><i class="fa fa-tasks"></i> Start Folder</label>
-    <input type="text" id="node-input-start" placeholder="Start Folder">
-</div>
-<div class="form-tips">
-    Some info.
-</div>
--->
