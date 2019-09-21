@@ -1,29 +1,38 @@
 # node-red-contrib-fs
 [Node-Red](http://nodered.org) nodes that work with the host filing system.
 
-#Nodes
+# Nodes
 - [file-lister](docs/file-lister.html) - List all files in a given starting folder optionally with a filename filter pattern. Also has options for file details and sub-folder recursion.
 - file-copier - In progress. Simple node to copy files (optionally with wildcard specifications).
 
-#Install
+# Install
 
-Run the following command in the root directory of your Node-RED install
+The recommended installation method is to use the Palette Manager in the Node-RED Editor.
+
+Alternatively, run the following command in your Node-RED userDir folder.
 
 	npm install node-red-contrib-fs
 
-While in development, install with:
+To install a development version, use:
 
     npm install https://github.com/TotallyInformation/node-red-contrib-fs/tarball/master
 
-#Updates
+# Updates
 - 0.0.9 - Initial release - File lister. 2016-06-14
 - 1.0.0 - Reworked File lister, more options. 2016-06-14
 - 1.0.1 - Fix from [Andreas Brain](https://github.com/abrain) correcting URLs in package.json. 2016-06-22
+- 1.0.2 - 2019-09-20
+   - PR from [juggledad](https://github.com/juggledad) adds option to exclude files/folders that start with a dot (e.g. hidden)
+   - Fix from [Lena Derksen](https://github.com/boisei0) fixes [Issue #9](https://github.com/TotallyInformation/node-red-contrib-fs/issues/9) by sending new messages rather than overwriting the incoming message on every send.
+   - Readiness for Node-RED v1.0
+   - Plus other minor updates/fixes.
 
-#Depends On
-- [readdirp](https://github.com/thlorenz/readdirp)
+# Depends On
+- [readdirp](https://github.com/paulmillr/readdirp)
 
-#To Do
+You need Node.JS v8.16+ and Node-RED v0.16+ to use this Node.
+
+# To Do
 - Add additional input overrides to file lister
 - Additional nodes: Create/Move/Delete file/folder
 
