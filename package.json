@@ -1,25 +1,39 @@
 {
   "name": "node-red-contrib-fs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Node-Red Node that handles the host filing system.",
   "dependencies": {
+    "readdirp": "^2.2.1"
   },
-  "author" : {
-    "name" : "Julian Knight",
-    "url" : "https://github.com/totallyinformation"
+  "author": {
+    "name": "Julian Knight",
+    "url": "https://github.com/totallyinformation"
   },
   "contributors": [
-    {"name": "Andreas Brain", "url": "https://github.com/abrain"}
+    {
+      "name": "Andreas Brain",
+      "url": "https://github.com/abrain"
+    },
+    {
+      "name": "Lena Derksen",
+      "url": "https://github.com/boisei0"
+    }
   ],
   "keywords": [
-    "node-red", "fs", "files", "folders"
+    "node-red",
+    "fs",
+    "files",
+    "folders"
   ],
   "node-red": {
+    "version": ">=0.16.0",
     "nodes": {
       "File Lister": "fs/fs-file-lister.js"
+    },
+    "notyetnodes": {
+      "File Copier": "fs/fs-file-copier.js"
     }
   },
-  "main": "fs/fs.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/totallyinformation/node-red-contrib-fs"
@@ -31,7 +45,15 @@
   "homepage": "https://github.com/totallyinformation/node-red-contrib-fs",
   "scripts": {},
   "directories": {},
-  "dependencies": {
-    "readdirp": "2.*"
-  }
+  "engines": {
+    "node": ">=8.16"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "maintained node versions",
+    "last 2 versions",
+    "not dead",
+    "not ie < 11"
+  ],
+  "main": "./fs/fs-file-lister.js"
 }
