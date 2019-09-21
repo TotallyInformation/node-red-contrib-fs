@@ -39,7 +39,8 @@ module.exports = function(RED) {
         node.name     = config.name
         node.start    = config.start
         node.pattern  = config.pattern
-        node.hidden   = config.hidden ? config.hidden : true /** @since v1.0.2 */
+        node.lstype   = config.lstype || 'files'              /** @since v1.0.2 */
+        node.hidden   = config.hidden !== undefined ? config.hidden : true  /** @since v1.0.2 */
         node.path     = config.path
         node.single   = config.single
         node.depth    = config.depth
@@ -80,6 +81,7 @@ module.exports = function(RED) {
             clonedMsg.config = {
                 'start': node.start,
                 'pattern': node.pattern,
+                'type': node.type, /** @since v1.0.2 */
                 'hidden': node.hidden, /** @since v1.0.2 */
                 'path': node.path,
                 'single': node.single,
@@ -92,15 +94,21 @@ module.exports = function(RED) {
 
             var options = {}
             options.fileFilter = node.pattern
-            options.entryType = 'files'
+            options.directoryFilter = node.pattern
+            options.type = node.lstype
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
             }
             if ( node.stat ) options.alwaysStat = true
-            // Show hidden files/folders? (NB: doesn't help with Windows hidden files/folders)
-            if ( node.hidden === false ) {
-                options.fileFilter = ['!.*']
-                options.directoryFilter = ['!.*']
+            /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
+             * NB: doesn't help with Windows hidden files/folders
+             **/
+            if ( node.hidden === true ) {
+                // No need for this if supplied patter starts with a dot
+                if (node.pattern.charAt(0) !== '.') {
+                    options.fileFilter = [node.pattern, `.${node.pattern}`]
+                    options.directoryFilter = [node.pattern, `.${node.pattern}`]
+                }
             }
 
             var arrayOut = []
@@ -120,7 +128,9 @@ module.exports = function(RED) {
                 })
                 // called for each entry found
                 .on('data', (entry) => {
-                    var file = entry.name
+                    var file = entry.basename
+                    console.log(file)
+
                     // Do we want just the file name output or the full path?
                     if ( node.path ) {
                         file = entry.fullPath
@@ -129,13 +139,18 @@ module.exports = function(RED) {
                     if ( node.stat ) {
                         file = {name: file}
                         try {
+                            /** NB: some stats props are BigInt which cannot be serialised (e.g. break debug node)
+                             *  so convert to Number but that may truncate the value.
+                             * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt
+                             **/
                             file.stat = {
-                                size: entry.stats.size,
-                                created: entry.stats.ctime,
+                                size: Number(entry.stats.size), //in bytes
+                                created: entry.stats.birthtime, // @since v1.1.0 ctime no longer used - see Node.js docs
                                 changed: entry.stats.mtime,
                                 accessed: entry.stats.atime,
-                                uid: entry.stats.uid,
-                                gid: entry.stats.gid,
+                                statusChanged: entry.stats.ctime, // @since v1.1.0
+                                uid: Number(entry.stats.uid),
+                                gid: Number(entry.stats.gid),
                                 mode: '0x' + entry.stats.mode.toString(16)
                             }
                         } catch (err) {
@@ -161,10 +176,18 @@ module.exports = function(RED) {
                 // called when all entries have been output
                 .on('end', () => {
                     // Send a single msg if arrayOut contains anything
-                    if ( arrayOut.length > 0 ) {
+                    if ( node.single ) {
+                        //if ( arrayOut.length > 0 ) {
                         node.status({fill:'blue',shape:'dot',text:'# files ' + arrayOut.length})
                         clonedMsg.payload = arrayOut
                         send(clonedMsg)
+                    } else {
+                        // Empty folder so output a warning
+                        if ( totalFiles === 0 ) {
+                            node.status({fill:'yellow',shape:'dot',text:'Empty Folder'})
+                            clonedMsg.payload = 'Empty Folder'
+                            send(clonedMsg)
+                        }
                     }
                     // Finished processing input msg (NR 1+)
                     done()
