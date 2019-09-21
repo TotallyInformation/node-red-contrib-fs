@@ -35,12 +35,12 @@ To install a development version, use:
 You need Node.JS v8.16+ and Node-RED v0.16+ to use this Node.
 
 # To Do
-- Add additional input overrides to file lister
-- Additional nodes: Create/Move/Delete file/folder
+
+Please see [Issue #3](https://github.com/TotallyInformation/node-red-contrib-fs/issues/3) on GitHub for details about where this Node will go next.
 
 If you have other ideas for filing system related nodes, please [raise an issue](https://github.com/TotallyInformation/node-red-contrib-fs/issues).
 
-#License
+# License
 
 This code is Open Source under an Apache 2 License. Please see the [apache2-license.txt file](https://github.com/TotallyInformation/node-red-contrib-fs/apache2-license.txt) for details.
 
