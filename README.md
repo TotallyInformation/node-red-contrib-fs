@@ -21,10 +21,12 @@ To install a development version, use:
 - 0.0.9 - Initial release - File lister. 2016-06-14
 - 1.0.0 - Reworked File lister, more options. 2016-06-14
 - 1.0.1 - Fix from [Andreas Brain](https://github.com/abrain) correcting URLs in package.json. 2016-06-22
-- 1.0.2 - 2019-09-20
-   - PR from [juggledad](https://github.com/juggledad) adds option to exclude files/folders that start with a dot (e.g. hidden)
+- 1.1.0 - 2019-09-22
+   - PR from [juggledad](https://github.com/juggledad) (amended) adds option to exclude files/folders that start with a dot (e.g. hidden)
    - Fix from [Lena Derksen](https://github.com/boisei0) fixes [Issue #9](https://github.com/TotallyInformation/node-red-contrib-fs/issues/9) by sending new messages rather than overwriting the incoming message on every send.
    - Readiness for Node-RED v1.0
+   - If root folder is empty, return an empty array or a warning payload (based suggestion from [jpmalich](https://github.com/jpmalich))
+   - Fixed file stat output - `created` was reporting incorrect date/time except on Windows. `statusChanged` datetime now added - see [Node.js docs](https://nodejs.org/api/fs.html#fs_stat_time_values) for details.
    - Plus other minor updates/fixes.
 
 # Depends On
