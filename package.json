@@ -2,8 +2,15 @@
   "name": "node-red-contrib-fs",
   "version": "1.0.2",
   "description": "Node-Red Node that handles the host filing system.",
+  "scripts": {
+    "npmtags": "npm dist-tag ls node-red-contrib-uibuilder",
+    "npmtagnext": "npm dist-tag add node-red-contrib-uibuilder@$npm_package_version next",
+    "gittags": "git tag",
+    "gittag": "git tag -a v$npm_package_version",
+    "gitpushtags": "git push origin --tags"
+  },
   "dependencies": {
-    "readdirp": "^2.2.1"
+    "readdirp": "^3.1.2"
   },
   "author": {
     "name": "Julian Knight",
@@ -13,6 +20,10 @@
     {
       "name": "Andreas Brain",
       "url": "https://github.com/abrain"
+    },
+    {
+      "name": "juggledad",
+      "url": "https://github.com/juggledad"
     },
     {
       "name": "Lena Derksen",
@@ -43,7 +54,6 @@
     "url": "https://github.com/totallyinformation/node-red-contrib-fs/issues"
   },
   "homepage": "https://github.com/totallyinformation/node-red-contrib-fs",
-  "scripts": {},
   "directories": {},
   "engines": {
     "node": ">=8.16"
