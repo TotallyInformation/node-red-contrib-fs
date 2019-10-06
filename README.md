@@ -28,6 +28,13 @@ To install a development version, use:
    - If root folder is empty, return an empty array or a warning payload (based suggestion from [jpmalich](https://github.com/jpmalich))
    - Fixed file stat output - `created` was reporting incorrect date/time except on Windows. `statusChanged` datetime now added - see [Node.js docs](https://nodejs.org/api/fs.html#fs_stat_time_values) for details.
    - Plus other minor updates/fixes.
+- 1.1.1 - Bug fixes and tidy
+   - Add GitHub templates
+   - Minor tidy of main code
+   - Improve NR v1 send/done functions
+   - Remove spurious `console.log(file)`
+   - Remove input `_msgid` from output so that all output messages get their own _msgid (Fixes [Issue #11](https://github.com/TotallyInformation/node-red-contrib-fs/issues/11))
+   - Update dependencies to latest
 
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
