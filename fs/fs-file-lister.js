@@ -74,9 +74,8 @@ module.exports = function(RED) {
             }
 
             var clonedMsg = RED.util.cloneMessage(msg)
-            // Keep the original topic and payload
-            clonedMsg.topic = msg.topic
-            clonedMsg.origPayload = msg.payload
+            // Remove original _msgid
+            delete clonedMsg._msgid
             // Output the nodes config
             clonedMsg.config = {
                 'start': node.start,
@@ -129,7 +128,6 @@ module.exports = function(RED) {
                 // called for each entry found
                 .on('data', (entry) => {
                     var file = entry.basename
-                    console.log(file)
 
                     // Do we want just the file name output or the full path?
                     if ( node.path ) {
