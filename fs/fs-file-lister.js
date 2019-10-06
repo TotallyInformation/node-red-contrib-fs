@@ -57,9 +57,9 @@ module.exports = function(RED) {
         node.on('input', function(msg, send, done) {
 
             // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
-            send = send || node.send
+            send = send || function() { node.send.apply(node,arguments) }
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
-            done = done || function(){}
+            done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
 
             // override config if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
