@@ -73,7 +73,7 @@ module.exports = function(RED) {
                 }
             }
 
-            var clonedMsg = RED.util.cloneMessage(msg);
+            var clonedMsg = RED.util.cloneMessage(msg)
             // Keep the original topic and payload
             clonedMsg.topic = msg.topic
             clonedMsg.origPayload = msg.payload
@@ -194,13 +194,6 @@ module.exports = function(RED) {
                 })
 
         }) // --- End of node input fn --- //
-
-        // Tidy up if we need to
-            //node.on("close", function() {
-            // Called when the node is shutdown - eg on redeploy.
-            // Allows ports to be closed, connections dropped etc.
-            // eg: node.client.disconnect();
-        //});
 
     } // --- End of fnFileLister --- //
 
