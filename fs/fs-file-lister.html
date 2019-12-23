@@ -27,8 +27,10 @@
     defaults: { // defines the editable properties of the node
       name:    {value:''},    //  along with default values.
       start:   {value:'/', required:true},   // Start folder
-      pattern: {value:'*'},   // Extension (optional)
-      hidden:  {value:true}, // include hidden files (@since v1.0.2)
+      pattern: {value:'*.*'},   // Extension (optional)
+      filter:  {value:'*'},    // Extension (optional)
+      hidden:  {value:true}, // include hidden files (@since v1.1.2)
+      lstype:  {value:false}, // Output folder names only 
       path:    {value:true},  // Output full path?
       single:  {value:false}, // Output a single array instead of multiple messages
       depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
@@ -45,12 +47,14 @@
         return this.name ? 'node_label_italic' : '';
     },
     oneditprepare: function () {
+        this.filter = this.filter || "oops"
         if ( this.hidden === undefined ) this.hidden = true
         //#region Set the checkbox states
         $('#node-input-hidden').prop('checked', this.hidden)
         $('#node-input-path').prop('checked', this.path)
         $('#node-input-single').prop('checked', this.single)
         $('#node-input-stat').prop('checked', this.stat)
+        $('#node-input-lstype').prop('unchecked', this.lstype)
         //#endregion checkbox states
     },
   })
@@ -66,13 +70,25 @@
 
   <div class="form-row">
     <label for="node-input-pattern"><i class="fa fa-file-code-o"></i> File Pattern</label>
-    <input type="text" id="node-input-pattern" placeholder="*">
+    <input type="text" id="node-input-pattern" placeholder="*.*">
+  </div>
+
+
+  <div class="form-row">
+    <label for="node-input-filter"><i class="fa fa-file-code-o"></i> Folder Pattern</label>
+    <input type="text" id="node-input-filter" placeholder="*">
   </div>
 
   <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
+  </div>
+
+  <div class="form-row">
+    <label>&nbsp;</label>
+    <input type="checkbox" id="node-input-lstype" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-lstype" style="width: 70%;">Search folder names only?</label>
   </div>
 
   <div class="form-row">
@@ -119,8 +135,8 @@
     </ul>
     <h3>What does this node do?</h3>
     <p>
-      This node searches a folder (and optionally sub-folders) for files. optionally
-      may filter on a specific file pattern.
+      This node searches a folder (and optionally sub-folders) for files. Optionally
+      may filter on a specific file pattern or return only the folder name.
     </p>
     <p>
       The folder and files come from the computer and operating system that is
@@ -128,9 +144,8 @@
     </p>
     <h3>Outputs</h3>
     <p>
-      By default, returns one message for each file found. The filename will be
-      in the msg.payload.
-       unless the <i>Output Single Message</i>
+      By default, returns one message for each file/folder found. The file/folder name 
+      will be in the msg.payload unless the <i>Output Single Message</i>
       option is chosen.
     </p>
     <p>
@@ -162,33 +177,46 @@
         Max length is 1024
       </li>
       <li>
-        <b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
-        start folder will also be searched.
+        <b>Folder Pattern</b> [ffilter] Set of strings that indicate the subfolders to 
+        search or avoid searching. If the 'Start Folder' has three sub folders 'A', 'B' 
+        and 'C' and you want to search in 'A' and 'C' but not 'B' you could use "A/!B/C', 'C'"
+        or "!B" (not 'B'). If folder 'C' also has a subfolder 'D' you want to search, you 
+        would use "'A', 'C', 'D'".
       </li>
       <li>
-        <b>Sub-folder Depth</b> Integer. Default 0 only searches the start folder.
-        Limits the depth of sub-folders that will be searched.
-      </li>
-      <li>
-        <b>Show Hidden files</b> checkbox. If selected (default) the msg.payload will
+        <b>Include hidden files in output?</b> checkbox. If selected (default) the msg.payload will
         include any hidden file-/folder-names. Deselect to include them. Note that Windows
         hidden files/folders are not effected unless they start with a dot.
+      </li>
+      <li>
+        <b>Search folder names only?</b> checkbox. If selected the msg.payload will
+        include only folder-names. Note that Windows hidden files/folders are not
+        effected unless they start with a dot.
       </li>
       <li>
         <b>Include full path in output</b> Checkbox. If selected (the default),
         the output payload will have the folder path prepended to the filename.
       </li>
       <li>
-        <b>Single</b> Checkbox. If selected, only one msg will be sent; the
-        msg.payload will contain an array of filenames.<br />
-        Otherwise, the default output is a single msg for each file found with
+        <b>Output single message (array)?</b> Checkbox. If selected, only one msg will be 
+        sent; the msg.payload will contain an array of file/folder names.<br />
+        Otherwise, the default output is a single msg for each file/folder found with
         the msg.payload a string containing the filename.
+      </li>
+      <li>
+        <b>Max. search Depth</b> Integer. Default 0 only searches the start folder.
+        Limits the depth of sub-folders that will be searched.
+      </li>
+     <li>
+        <b>Return file details?</b>  Checkbox. If selected, msg.payload will contain an 
+        array of objects, each containing the name of the file/folder and status Information
+        about it.
       </li>
     </ul>
     <p>
       To override the configured options, pass in a msg with msg.payload like:
-      <code>{"start":"/my/folder","pattern":"*.json"}</code>
-      Any missing options will be picked up from the configured node. Only those 2
+      <code>{"start":"/my/folder","pattern":"*.json","filter":"!context"}</code>
+      Any missing options will be picked up from the configured node. Only those 3
       overrides are currently available.
     </p>
 </script>
