@@ -39,12 +39,20 @@ module.exports = function(RED) {
         node.name     = config.name
         node.start    = config.start
         node.pattern  = config.pattern
-        node.lstype   = config.lstype || 'files'              /** @since v1.0.2 */
+        node.filter   = config.filter 
+        node.lstype   = config.lstype !== undefined ? config.lstype : true  /** @since v1.0.3 */
         node.hidden   = config.hidden !== undefined ? config.hidden : true  /** @since v1.0.2 */
         node.path     = config.path
         node.single   = config.single
         node.depth    = config.depth
         node.stat     = config.stat
+                
+ // debugging - start ==================
+            var n = JSON.stringify(node, null, 2)
+            node.warn('NODE='+n)
+//            var c = JSON.stringify(config, null, 2)
+//            node.warn('CONFIG='+c)
+// debugging - end ==================
 
         // Make sure the parameters are strings
         if ( (typeof node.start !== 'string') || (typeof node.pattern !== 'string') ) {
@@ -56,7 +64,7 @@ module.exports = function(RED) {
         /** @since v1.0.1, amended ready for Node-RED v1 */
         node.on('input', function(msg, send, done) {
 
-            // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
+           // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
             send = send || function() { node.send.apply(node,arguments) }
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
             done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
@@ -65,11 +73,16 @@ module.exports = function(RED) {
             if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
                 if ( validFolderName(msg.payload.start) ) {
                     node.start = msg.payload.start
-                }
+               }
             }
             if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
                 if ( (typeof msg.payload.pattern === 'string') && (msg.payload.pattern.length < 1024) ) {
                     node.pattern = msg.payload.pattern
+                }
+            }
+            if ( (typeof msg.payload === 'object') && ('filter' in msg.payload) ) {
+                if ( (typeof msg.payload.filter === 'string') && (msg.payload.filter.length < 1024) ) {
+                    node.filter = msg.payload.filter
                 }
             }
 
@@ -80,6 +93,7 @@ module.exports = function(RED) {
             clonedMsg.config = {
                 'start': node.start,
                 'pattern': node.pattern,
+                'filter': node.filter,
                 'type': node.type, /** @since v1.0.2 */
                 'hidden': node.hidden, /** @since v1.0.2 */
                 'path': node.path,
@@ -92,9 +106,13 @@ module.exports = function(RED) {
             var totalFiles = 0
 
             var options = {}
-            options.fileFilter = node.pattern
-            options.directoryFilter = node.pattern
-            options.type = node.lstype
+            
+            if ( node.lstype === true ) {
+            	options.type = 'directories'
+            } else {
+				options.type = 'files'
+            }
+            	
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
             }
@@ -102,15 +120,25 @@ module.exports = function(RED) {
             /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
              * NB: doesn't help with Windows hidden files/folders
              **/
-            if ( node.hidden === true ) {
+             node.pattern = node.pattern.replace(/ /g,"")
+             if ( node.hidden === true ) {
                 // No need for this if supplied patter starts with a dot
                 if (node.pattern.charAt(0) !== '.') {
-                    options.fileFilter = [node.pattern, `.${node.pattern}`]
-                    options.directoryFilter = [node.pattern, `.${node.pattern}`]
+                    var np = node.pattern.replace(/,/g,",.")
+                    node.pattern = node.pattern +",."+np
                 }
             }
 
+            options.fileFilter = node.pattern.split(',')
+
+//			change shashes (/) to commas (,) then get rid of extra spaces
+            node.filter = node.filter.replace(/\//g,",")
+            node.filter = node.filter.replace(/ /g,"")
+            
+            options.directoryFilter = node.filter.split(',')
+
             var arrayOut = []
+            
 
             // Recursively read the folder using the stream API
             // @ts-ignore
