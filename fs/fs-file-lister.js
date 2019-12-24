@@ -39,20 +39,17 @@ module.exports = function(RED) {
         node.name     = config.name
         node.start    = config.start
         node.pattern  = config.pattern
-        node.filter   = config.filter 
-        node.lstype   = config.lstype !== undefined ? config.lstype : true  /** @since v1.0.3 */
+        node.folders  = config.folders 
+        node.lstype   = config.lstype 
         node.hidden   = config.hidden !== undefined ? config.hidden : true  /** @since v1.0.2 */
         node.path     = config.path
         node.single   = config.single
         node.depth    = config.depth
         node.stat     = config.stat
                 
- // debugging - start ==================
-            var n = JSON.stringify(node, null, 2)
-            node.warn('NODE='+n)
-//            var c = JSON.stringify(config, null, 2)
-//            node.warn('CONFIG='+c)
-// debugging - end ==================
+		if (node.pattern == "") node.pattern = "*.*"
+		if (node.folders == "") node.folders = "*"
+
 
         // Make sure the parameters are strings
         if ( (typeof node.start !== 'string') || (typeof node.pattern !== 'string') ) {
@@ -64,7 +61,7 @@ module.exports = function(RED) {
         /** @since v1.0.1, amended ready for Node-RED v1 */
         node.on('input', function(msg, send, done) {
 
-           // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
+          // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
             send = send || function() { node.send.apply(node,arguments) }
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
             done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
@@ -75,14 +72,20 @@ module.exports = function(RED) {
                     node.start = msg.payload.start
                }
             }
+            // file pattern
             if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
                 if ( (typeof msg.payload.pattern === 'string') && (msg.payload.pattern.length < 1024) ) {
                     node.pattern = msg.payload.pattern
                 }
             }
-            if ( (typeof msg.payload === 'object') && ('filter' in msg.payload) ) {
-                if ( (typeof msg.payload.filter === 'string') && (msg.payload.filter.length < 1024) ) {
-                    node.filter = msg.payload.filter
+            if ( (typeof msg.payload === 'object') && ('lstype' in msg.payload) ) {
+                if ( (typeof msg.payload.lstype === 'string') && (msg.payload.lstype.length < 20) ) {
+                    node.lstype = msg.payload.lstype.toLowerCase()
+                }
+            }
+            if ( (typeof msg.payload === 'object') && ('depth' in msg.payload) ) {
+                if ( (typeof msg.payload.depth === 'number') && (msg.payload.depth < 10) ) {
+                    node.depth = msg.payload.depth
                 }
             }
 
@@ -93,8 +96,8 @@ module.exports = function(RED) {
             clonedMsg.config = {
                 'start': node.start,
                 'pattern': node.pattern,
-                'filter': node.filter,
-                'type': node.type, /** @since v1.0.2 */
+                'folders': node.folders,
+                'lstype': node.lstype, 
                 'hidden': node.hidden, /** @since v1.0.2 */
                 'path': node.path,
                 'single': node.single,
@@ -107,11 +110,7 @@ module.exports = function(RED) {
 
             var options = {}
             
-            if ( node.lstype === true ) {
-            	options.type = 'directories'
-            } else {
-				options.type = 'files'
-            }
+           	options.type = node.lstype
             	
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
@@ -129,16 +128,15 @@ module.exports = function(RED) {
                 }
             }
 
-            options.fileFilter = node.pattern.split(',')
-
 //			change shashes (/) to commas (,) then get rid of extra spaces
-            node.filter = node.filter.replace(/\//g,",")
-            node.filter = node.filter.replace(/ /g,"")
+            node.folders = node.folders.replace(/\//g,",")
+            node.folders = node.folders.replace(/ /g,"")
             
-            options.directoryFilter = node.filter.split(',')
+//			split the file and directory options into arrays arguments for 'readdirp'
+            options.fileFilter = node.pattern.split(',')
+            options.directoryFilter = node.folders.split(',')
 
-            var arrayOut = []
-            
+            var arrayOut = []          
 
             // Recursively read the folder using the stream API
             // @ts-ignore
