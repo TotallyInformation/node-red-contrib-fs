@@ -28,9 +28,9 @@
       name:    {value:''},    //  along with default values.
       start:   {value:'/', required:true},   // Start folder
       pattern: {value:'*.*'},   // Extension (optional)
-      filter:  {value:'*'},    // Extension (optional)
+      folders: {value:'*'},    // Extension (optional)
       hidden:  {value:true}, // include hidden files (@since v1.1.2)
-      lstype:  {value:false}, // Output folder names only 
+      lstype:  {value:'files'}, // Output folder names only 
       path:    {value:true},  // Output full path?
       single:  {value:false}, // Output a single array instead of multiple messages
       depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
@@ -54,9 +54,10 @@
         $('#node-input-path').prop('checked', this.path)
         $('#node-input-single').prop('checked', this.single)
         $('#node-input-stat').prop('checked', this.stat)
-        $('#node-input-lstype').prop('unchecked', this.lstype)
         //#endregion checkbox states
     },
+    
+    labellstype: {value: 'files'}
   })
 </script>
 
@@ -73,22 +74,24 @@
     <input type="text" id="node-input-pattern" placeholder="*.*">
   </div>
 
+  <div class="form-row">
+    <label for="node-input-folders"><i class="fa fa-folder-o"></i> Folder Pattern</label>
+    <input type="text" id="node-input-folders" placeholder="*">
+  </div>
+
 
   <div class="form-row">
-    <label for="node-input-filter"><i class="fa fa-file-code-o"></i> Folder Pattern</label>
-    <input type="text" id="node-input-filter" placeholder="*">
-  </div>
+    <label for="node-input-lstype" style="width:110px;"><i class="icon-tag"></i> Files/Folders</label>
+        <select id="node-input-lstype" placeholder="lstype">
+          <option value="files">Files</option>
+          <option value="directories">Folders</option>
+        </select>
+    </div>
 
   <div class="form-row">
     <label>&nbsp;</label>
     <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
     <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
-  </div>
-
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-lstype" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-lstype" style="width: 70%;">Search folder names only?</label>
   </div>
 
   <div class="form-row">
@@ -177,7 +180,7 @@
         Max length is 1024
       </li>
       <li>
-        <b>Folder Pattern</b> [ffilter] Set of strings that indicate the subfolders to 
+        <b>Folders Pattern</b> [folders] Set of strings that indicate the subfolders to 
         search or avoid searching. If the 'Start Folder' has three sub folders 'A', 'B' 
         and 'C' and you want to search in 'A' and 'C' but not 'B' you could use "A/!B/C', 'C'"
         or "!B" (not 'B'). If folder 'C' also has a subfolder 'D' you want to search, you 
@@ -215,7 +218,7 @@
     </ul>
     <p>
       To override the configured options, pass in a msg with msg.payload like:
-      <code>{"start":"/my/folder","pattern":"*.json","filter":"!context"}</code>
+      <code>{"start":"/my/folder","pattern":"*.json","folders":"!context"}</code>
       Any missing options will be picked up from the configured node. Only those 3
       overrides are currently available.
     </p>
