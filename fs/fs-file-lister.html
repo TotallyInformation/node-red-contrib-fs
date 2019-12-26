@@ -85,6 +85,7 @@
         <select id="node-input-lstype" placeholder="lstype">
           <option value="files">Files</option>
           <option value="directories">Folders</option>
+          <option value="both">Both</option>
         </select>
     </div>
 
@@ -139,7 +140,7 @@
     <h3>What does this node do?</h3>
     <p>
       This node searches a folder (and optionally sub-folders) for files. Optionally
-      may filter on a specific file pattern or return only the folder name.
+      may filter on a specific file or folder pattern or return only the folder name.
     </p>
     <p>
       The folder and files come from the computer and operating system that is
@@ -186,6 +187,14 @@
         or "!B" (not 'B'). If folder 'C' also has a subfolder 'D' you want to search, you 
         would use "'A', 'C', 'D'".
       </li>
+      <li>
+        <b>Files/Folders</b> [lstype] This dropdown allows you to list Files (default), Folders 
+        or both in the output. This can be overridden in the incoming msg.payload.lstype using 'files'
+        'folders' or 'both'
+      </li>
+      
+      Files/Folders 
+      
       <li>
         <b>Include hidden files in output?</b> checkbox. If selected (default) the msg.payload will
         include any hidden file-/folder-names. Deselect to include them. Note that Windows
