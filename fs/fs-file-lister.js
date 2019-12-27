@@ -145,6 +145,7 @@ module.exports = function(RED) {
 
             var options = {}
             
+            if (node.lstype == 'folders') {node.lstype = 'directories'}
             if (node.lstype == 'both') {node.lstype = 'files_directories'}
            	options.type = node.lstype
             	
