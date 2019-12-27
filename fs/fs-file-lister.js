@@ -99,16 +99,28 @@ module.exports = function(RED) {
                     node.hidden = msg.payload.hidden
                 }
             }
-            // override 'hidden' if passed suitable payload
-            if ( (typeof msg.payload === 'object') && ('hidden' in msg.payload) ) {
-                if ( (typeof msg.payload.hidden === 'boolean')  ) {
-                    node.hidden = msg.payload.hidden
+            // override 'path' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('path' in msg.payload) ) {
+                if ( (typeof msg.payload.path === 'boolean')  ) {
+                    node.path = msg.payload.path
+                }
+            }
+            // override 'single' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('single' in msg.payload) ) {
+                if ( (typeof msg.payload.single === 'boolean')  ) {
+                    node.single = msg.payload.single
                 }
             }
             // override 'depth' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('depth' in msg.payload) ) {
-                if ( (typeof msg.payload.depth === 'number') && (msg.payload.depth < 10) ) {
+                if ( (typeof msg.payload.depth === 'number') && (msg.payload.depth < 11) ) {
                     node.depth = msg.payload.depth
+                }
+            }
+            // override 'stat' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('stat' in msg.payload) ) {
+                if ( (typeof msg.payload.stat === 'boolean')  ) {
+                    node.stat = msg.payload.stat
                 }
             }
 
@@ -156,11 +168,11 @@ module.exports = function(RED) {
                 }
             }
 
-	    // change shashes (/) to commas (,) then get rid of extra spaces
+//			change shashes (/) to commas (,) then get rid of extra spaces
             node.folders = node.folders.replace(/\//g,",")
             node.folders = node.folders.replace(/ /g,"")
             
-	    // split the file and directory options into arrays arguments for 'readdirp'
+//			split the file and directory options into arrays arguments for 'readdirp'
             options.fileFilter = node.pattern.split(',')
             options.directoryFilter = node.folders.split(',')
 
