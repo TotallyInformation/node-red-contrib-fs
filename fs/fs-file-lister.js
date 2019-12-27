@@ -66,24 +66,46 @@ module.exports = function(RED) {
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
             done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
 
-            // override config if passed suitable payload
+		// ---------------------------------------------------------
+ 		// this section handles the overriding 'config' if option coming in msg.payload
+ 		// ---------------------------------------------------------
+            // override 'start if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
                 if ( validFolderName(msg.payload.start) ) {
                     node.start = msg.payload.start
                }
             }
-            // file pattern
+            // override file 'pattern' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
                 if ( (typeof msg.payload.pattern === 'string') && (msg.payload.pattern.length < 1024) ) {
                     node.pattern = msg.payload.pattern
                 }
             }
-            
+            // override 'folders' pattern if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('folders' in msg.payload) ) {
+                if ( (typeof msg.payload.folders === 'string') && (msg.payload.folders.length < 1024) ) {
+                    node.folders = msg.payload.folders
+                }
+            }
+            // override 'lstype' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('lstype' in msg.payload) ) {
                 if ( (typeof msg.payload.lstype === 'string') && (msg.payload.lstype.length < 50) ) {
                     node.lstype = msg.payload.lstype.toLowerCase()
                 }
             }
+            // override 'hidden' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('hidden' in msg.payload) ) {
+                if ( (typeof msg.payload.hidden === 'boolean')  ) {
+                    node.hidden = msg.payload.hidden
+                }
+            }
+            // override 'hidden' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('hidden' in msg.payload) ) {
+                if ( (typeof msg.payload.hidden === 'boolean')  ) {
+                    node.hidden = msg.payload.hidden
+                }
+            }
+            // override 'depth' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('depth' in msg.payload) ) {
                 if ( (typeof msg.payload.depth === 'number') && (msg.payload.depth < 10) ) {
                     node.depth = msg.payload.depth
@@ -134,11 +156,11 @@ module.exports = function(RED) {
                 }
             }
 
-//			change shashes (/) to commas (,) then get rid of extra spaces
+	    // change shashes (/) to commas (,) then get rid of extra spaces
             node.folders = node.folders.replace(/\//g,",")
             node.folders = node.folders.replace(/ /g,"")
             
-//			split the file and directory options into arrays arguments for 'readdirp'
+	    // split the file and directory options into arrays arguments for 'readdirp'
             options.fileFilter = node.pattern.split(',')
             options.directoryFilter = node.folders.split(',')
 
