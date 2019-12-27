@@ -169,11 +169,11 @@ module.exports = function(RED) {
                 }
             }
 
-//			change shashes (/) to commas (,) then get rid of extra spaces
+	    // change shashes (/) to commas (,) then get rid of extra spaces
             node.folders = node.folders.replace(/\//g,",")
             node.folders = node.folders.replace(/ /g,"")
             
-//			split the file and directory options into arrays arguments for 'readdirp'
+	    // split the file and directory options into arrays arguments for 'readdirp'
             options.fileFilter = node.pattern.split(',')
             options.directoryFilter = node.folders.split(',')
 
