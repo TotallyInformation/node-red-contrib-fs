@@ -167,49 +167,48 @@
         absolute paths. e.g. /home/pi<br />
         Windows path names are also accepted. On Windows, you can use either form.
         There is no need to escape backslashes.
-        Max path length is 1024 (Overrides with path to starting folder)
+        Max path length is 1024 (override: path to starting folder)
       <li>
         <b>File Pattern</b> [pattern] String that will be matched against the filenames.
-        Standard "glob" file patterns are allowed. Defaults to '*' which will return all files.
-        Max length is 1024 (Overrides with file pattern)
+        Standard "glob" file patterns are allowed. Defaults to '*.*' which will return all files.
+        Max length is 1024 (override: file pattern)
       </li>
       <li>
-        <b>Folders Pattern</b> [folders] Set of strings that indicate the subfolders to 
+        <b>Folders Pattern</b> [folders] Defaults to '*' </br>Set of strings that indicate the subfolders to 
         search or avoid searching. If the 'Start Folder' has three sub folders 'A', 'B' 
         and 'C' and you want to search in 'A' and 'C' but not 'B' you could use "A/!B/C', 'C'"
         or "!B" (not 'B'). If folder 'C' also has a subfolder 'D' you want to search, you 
-        would use "'A', 'C', 'D'". (Overrides with folder pattern)
+        would use "'A', 'C', 'D'". (override: folder pattern)
       </li>
       <li>
         <b>Files/Folders</b> [lstype] This dropdown allows you to list Files (default), Folders 
-        or both in the output. (Overrides with 'files', 'folders' or 'both')
+        or both in the output. (override: 'files', 'folders' or 'both')
       </li>
       <li>
         <b>Include hidden files in output?</b> [hidden] checkbox. If selected (default) the 
         msg.payload will include any hidden file-/folder-names. Deselect to include them. 
         Note that Windows hidden files/folders are not effected unless they start with a dot. 
-        (Overrides with boolean true/false)
+        (override: boolean true/false)
       </li>
       <li>
         <b>Include full path in output</b> [path] checkbox. If selected (the default),
-        the output payload will have the folder path prepended to the filename. (Overrides 
-        with boolean true/false)
+        the output payload will have the folder path prepended to the filename. (override: 
+        boolean true/false)
       </li>
       <li>
         <b>Output single message (array)?</b> [single] checkbox. If selected, only one msg will be 
         sent; the msg.payload will contain an array of file/folder names.<br />
         Otherwise, the default output is a single msg for each file/folder found with
-        the msg.payload a string containing the filename. (Overrides with boolean true/false)
+        the msg.payload a string containing the filename. (override: boolean true/false)
       </li>
       <li>
         <b>Max. search Depth</b> [depth] Integer. Default 0 only searches the start folder.
-        Limits the depth of sub-folders that will be searched (Maximum 10). (Overrides with 
-        an integer <= 10)
+        Limits the depth of sub-folders that will be searched (Maximum 10). (override: integer <= 10)
       </li>
      <li>
         <b>Return file details?</b> [stat] Checkbox. If selected, msg.payload will contain an 
         array of objects, each containing the name of the file/folder and status Information
-        about it. (Overrides with boolean true/false)
+        about it. (override: boolean true/false)
       </li>
     </ul>
     <p>
