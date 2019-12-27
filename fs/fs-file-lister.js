@@ -123,6 +123,9 @@ module.exports = function(RED) {
                     node.stat = msg.payload.stat
                 }
             }
+            
+            if (node.lstype == 'folders') {node.lstype = 'directories'}
+            if (node.lstype == 'both') {node.lstype = 'files_directories'}
 
             var clonedMsg = RED.util.cloneMessage(msg)
             // Remove original _msgid
@@ -144,10 +147,8 @@ module.exports = function(RED) {
             var totalFiles = 0
 
             var options = {}
-            
-            if (node.lstype == 'folders') {node.lstype = 'directories'}
-            if (node.lstype == 'both') {node.lstype = 'files_directories'}
-           	options.type = node.lstype
+	    
+            options.type = node.lstype
             	
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
