@@ -17,178 +17,203 @@
 <!-- This creates and configures the onscreen elements of the node           -->
 
 <script type="text/javascript">
-  // Module name must match this nodes html file
-  // Use the same name in the data-template-name entries
-  var moduleName = 'fs-file-lister'
-
-  RED.nodes.registerType(moduleName,{
-    category: 'storage',      // the palette category
-    color: '#E6E0F8',
-    defaults: { // defines the editable properties of the node
-      name:    {value:''},    //  along with default values.
-      start:   {value:'/', required:true},   // Start folder
-      pattern: {value:'*'},   // Extension (optional)
-      hidden:  {value:true}, // include hidden files (@since v1.0.2)
-      path:    {value:true},  // Output full path?
-      single:  {value:false}, // Output a single array instead of multiple messages
-      depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
-      stat:    {value:false}, // If true, return file meta-data
-    },
-    inputs:1,               // set the number of inputs - only 0 or 1
-    outputs:1,              // set the number of outputs - 0 to n
-    // set the icon (held in icons dir below where you save the node)
-    icon: 'file.png',     // saved in  icons/myicon.png
-    label: function() {     // sets the default label contents
-        return this.name||this.topic||'File Lister';
-    },
-    labelStyle: function() { // sets the class to apply to the label
-        return this.name ? 'node_label_italic' : '';
-    },
-    oneditprepare: function () {
-        if ( this.hidden === undefined ) this.hidden = true
-        //#region Set the checkbox states
-        $('#node-input-hidden').prop('checked', this.hidden)
-        $('#node-input-path').prop('checked', this.path)
-        $('#node-input-single').prop('checked', this.single)
-        $('#node-input-stat').prop('checked', this.stat)
-        //#endregion checkbox states
-    },
-  })
-</script>
-
-<!-- First, the content of the edit dialog is defined.                       -->
-<!-- data-template-name identifies the node type this is for              -->
-<script type="text/x-red" data-template-name="fs-file-lister">
-  <div class="form-row" title="Start (root) folder for search">
-    <label for="node-input-start"><i class="fa fa-folder"></i> Start Folder</label>
-    <input type="text" id="node-input-start" placeholder="Start Folder">
-  </div>
-
-  <div class="form-row">
-    <label for="node-input-pattern"><i class="fa fa-file-code-o"></i> File Pattern</label>
-    <input type="text" id="node-input-pattern" placeholder="*">
-  </div>
-
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
-  </div>
-
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
-  </div>
-
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-single" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-single" style="width: 70%;">Output single message (array)?</label>
-  </div>
-
-  <div class="form-row" title="Set to >0 to search sub-folders.">
-    <label for="node-input-depth"><i class="fa fa-level-down"></i> Max. search depth</label>
-    <input type="text" id="node-input-depth" placeholder="0 = no recursion">
-  </div>
-
-  <div class="form-row">
-    <label>&nbsp;</label>
-    <input type="checkbox" id="node-input-stat" style="display: inline-block; width: auto; vertical-align: top;">
-    <label for="node-input-stat" style="width: 70%;">Return file details?</label>
-  </div>
-
-  <!-- Most nodes have a 'name' property. Should always be the last option -->
-  <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
-</script>
-
-<!-- Next, some simple help text is provided for the node.                   -->
-<!-- The first <p> is used as the pop-up tool tip when hovering over pallette -->
-<script type="text/x-red" data-help-name="fs-file-lister">
-    <h2>
-      Filing System Utilities: File Lister
-    </h2>
-    <h3>To Do</h3>
-    <ul>
-      <li>
-        Allow other overrides to be passed in.
-      </li>
-    </ul>
-    <h3>What does this node do?</h3>
-    <p>
-      This node searches a folder (and optionally sub-folders) for files. optionally
-      may filter on a specific file pattern.
-    </p>
-    <p>
-      The folder and files come from the computer and operating system that is
-      running Node-Red. AKA, the "host".
-    </p>
-    <h3>Outputs</h3>
-    <p>
-      By default, returns one message for each file found. The filename will be
-      in the msg.payload.
-       unless the <i>Output Single Message</i>
-      option is chosen.
-    </p>
-    <p>
-      If the <i>Output Single Message</i> option is chosen, the msg.payload will
-      contain an <i>array</i> of filenames.
-    </p>
-    <p>
-      Output filenames will contain the full file path if the <i>Full Path</i>
-      option is selected.
-    </p>
-    <p>
-      If the "Return file details" option is selected, each file output will be
-      an object. {"name":[filename], "stat": {"size":[fsize], ...}}
-    </p>
-    <h3>Inputs</h3>
-    <ul>
-      <li>
-        <b>Start Folder</b> [start] String containing the start folder location to search
-        for files. Without a leading '/', will search from the location the node
-        is installed which is not terribly useful so it is preferred to use
-        absolute paths. e.g. /home/pi<br />
-        Windows path names are also accepted. On Windows, you can use either form.
-        There is no need to escape backslashes.
-        Max path length is 1024
-      </li>
-      <li>
-        <b>File Pattern</b> [pattern] String that will be matched against the filenames.
-        Standard "glob" file patterns are allowed. Defaults to '*' which will return all files.
-        Max length is 1024
-      </li>
-      <li>
-        <b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
-        start folder will also be searched.
-      </li>
-      <li>
-        <b>Sub-folder Depth</b> Integer. Default 0 only searches the start folder.
-        Limits the depth of sub-folders that will be searched.
-      </li>
-      <li>
-        <b>Show Hidden files</b> checkbox. If selected (default) the msg.payload will
-        include any hidden file-/folder-names. Deselect to include them. Note that Windows
-        hidden files/folders are not effected unless they start with a dot.
-      </li>
-      <li>
-        <b>Include full path in output</b> Checkbox. If selected (the default),
-        the output payload will have the folder path prepended to the filename.
-      </li>
-      <li>
-        <b>Single</b> Checkbox. If selected, only one msg will be sent; the
-        msg.payload will contain an array of filenames.<br />
-        Otherwise, the default output is a single msg for each file found with
-        the msg.payload a string containing the filename.
-      </li>
-    </ul>
-    <p>
-      To override the configured options, pass in a msg with msg.payload like:
-      <code>{"start":"/my/folder","pattern":"*.json"}</code>
-      Any missing options will be picked up from the configured node. Only those 2
-      overrides are currently available.
-    </p>
-</script>
+    // Module name must match this nodes html file
+    // Use the same name in the data-template-name entries
+    var moduleName = 'fs-file-lister'
+  
+    RED.nodes.registerType(moduleName,{
+      category: 'storage',      // the palette category
+      color: '#E6E0F8',
+      defaults: { // defines the editable properties of the node
+        name:    {value:''},    //  along with default values.
+        start:   {value:'/', required:true},   // Start folder
+        pattern: {value:'*.*'},   // Extension (optional)
+        folders: {value:'*'},    // Extension (optional)
+        hidden:  {value:true}, // include hidden files (@since v1.1.2)
+        lstype:  {value:'files'}, // Output folder names only 
+        path:    {value:true},  // Output full path?
+        single:  {value:false}, // Output a single array instead of multiple messages
+        depth:   {value:0, validate:RED.validators.number()},    // Max recursion depth
+        stat:    {value:false}, // If true, return file meta-data
+      },
+      inputs:1,               // set the number of inputs - only 0 or 1
+      outputs:1,              // set the number of outputs - 0 to n
+      // set the icon (held in icons dir below where you save the node)
+      icon: 'file.png',     // saved in  icons/myicon.png
+      label: function() {     // sets the default label contents
+          return this.name||this.topic||'File Lister';
+      },
+      labelStyle: function() { // sets the class to apply to the label
+          return this.name ? 'node_label_italic' : '';
+      },
+      oneditprepare: function () {
+          this.filter = this.filter || "oops"
+          if ( this.hidden === undefined ) this.hidden = true
+          //#region Set the checkbox states
+          $('#node-input-hidden').prop('checked', this.hidden)
+          $('#node-input-path').prop('checked', this.path)
+          $('#node-input-single').prop('checked', this.single)
+          $('#node-input-stat').prop('checked', this.stat)
+          //#endregion checkbox states
+      },
+      
+      labellstype: {value: 'files'}
+    })
+  </script>
+  
+  <!-- First, the content of the edit dialog is defined.                       -->
+  <!-- data-template-name identifies the node type this is for              -->
+  <script type="text/x-red" data-template-name="fs-file-lister">
+    <div class="form-row" title="Start (root) folder for search">
+      <label for="node-input-start"><i class="fa fa-folder"></i> Start Folder</label>
+      <input type="text" id="node-input-start" placeholder="Start Folder">
+    </div>
+  
+    <div class="form-row">
+      <label for="node-input-pattern"><i class="fa fa-file-code-o"></i> File Pattern</label>
+      <input type="text" id="node-input-pattern" placeholder="*.*">
+    </div>
+  
+    <div class="form-row">
+      <label for="node-input-folders"><i class="fa fa-folder-o"></i> Folder Pattern</label>
+      <input type="text" id="node-input-folders" placeholder="*">
+    </div>
+  
+  
+    <div class="form-row">
+      <label for="node-input-lstype" style="width:110px;"><i class="icon-tag"></i> Files/Folders</label>
+          <select id="node-input-lstype" placeholder="lstype">
+            <option value="files">Files</option>
+            <option value="directories">Folders</option>
+            <option value="both">Both</option>
+          </select>
+      </div>
+  
+    <div class="form-row">
+      <label>&nbsp;</label>
+      <input type="checkbox" id="node-input-hidden" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-hidden" style="width: 70%;">Include hidden files in output?</label>
+    </div>
+  
+    <div class="form-row">
+      <label>&nbsp;</label>
+      <input type="checkbox" id="node-input-path" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-path" style="width: 70%;">Include full path in output?</label>
+    </div>
+  
+    <div class="form-row">
+      <label>&nbsp;</label>
+      <input type="checkbox" id="node-input-single" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-single" style="width: 70%;">Output single message (array)?</label>
+    </div>
+  
+    <div class="form-row" title="Set to >0 to search sub-folders.">
+      <label for="node-input-depth"><i class="fa fa-level-down"></i> Max. search depth</label>
+      <input type="text" id="node-input-depth" placeholder="0 = no recursion">
+    </div>
+  
+    <div class="form-row">
+      <label>&nbsp;</label>
+      <input type="checkbox" id="node-input-stat" style="display: inline-block; width: auto; vertical-align: top;">
+      <label for="node-input-stat" style="width: 70%;">Return file details?</label>
+    </div>
+  
+    <!-- Most nodes have a 'name' property. Should always be the last option -->
+    <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+  </script>
+  
+  <!-- Next, some simple help text is provided for the node.                   -->
+  <!-- The first <p> is used as the pop-up tool tip when hovering over pallette -->
+  <script type="text/x-red" data-help-name="fs-file-lister">
+      <h2>
+        Filing System Utilities: File Lister
+      </h2>
+      <h3>What does this node do?</h3>
+      <p>
+        This node searches a folder (and optionally sub-folders) for files. Optionally
+        may filter on a specific file or folder pattern or return only the folder name.
+      </p>
+      <p>
+        The folder and files come from the computer and operating system that is
+        running Node-Red. AKA, the "host".
+      </p>
+      <h3>Outputs</h3>
+      <p>
+        By default, returns one message for each file/folder found. The file/folder name 
+        will be in the msg.payload unless the <i>Output Single Message</i>
+        option is chosen.
+      </p>
+      <p>
+        If the <i>Output Single Message</i> option is chosen, the msg.payload will
+        contain an <i>array</i> of filenames.
+      </p>
+      <p>
+        Output filenames will contain the full file path if the <i>Full Path</i>
+        option is selected.
+      </p>
+      <p>
+        If the "Return file details" option is selected, each file output will be
+        an object. {"name":[filename], "stat": {"size":[fsize], ...}}
+      </p>
+      <h3>Inputs</h3>
+      <ul>
+        <li>
+          <b>Start Folder</b> [start] String containing the start folder location to search
+          for files. Without a leading '/', will search from the location the node
+          is installed which is not terribly useful so it is preferred to use
+          absolute paths. e.g. /home/pi<br />
+          Windows path names are also accepted. On Windows, you can use either form.
+          There is no need to escape backslashes.
+          Max path length is 1024 (override: path to starting folder)
+        <li>
+          <b>File Pattern</b> [pattern] String that will be matched against the filenames.
+          Standard "glob" file patterns are allowed. Defaults to '*.*' which will return all files.
+          Max length is 1024 (override: file pattern)
+        </li>
+        <li>
+          <b>Folders Pattern</b> [folders] Defaults to '*' </br>Set of strings that indicate the subfolders to 
+          search or avoid searching. If the 'Start Folder' has three sub folders 'A', 'B' 
+          and 'C' and you want to search in 'A' and 'C' but not 'B' you could use "A/!B/C', 'C'"
+          or "!B" (not 'B'). If folder 'C' also has a subfolder 'D' you want to search, you 
+          would use "'A', 'C', 'D'". (override: folder pattern)
+        </li>
+        <li>
+          <b>Files/Folders</b> [lstype] This dropdown allows you to list Files (default), Folders 
+          or both in the output. (override: 'files', 'folders' or 'both')
+        </li>
+        <li>
+          <b>Include hidden files in output?</b> [hidden] checkbox. If selected (default) the 
+          msg.payload will include any hidden file-/folder-names. Deselect to include them. 
+          Note that Windows hidden files/folders are not effected unless they start with a dot. 
+          (override: boolean true/false)
+        </li>
+        <li>
+          <b>Include full path in output</b> [path] checkbox. If selected (the default),
+          the output payload will have the folder path prepended to the filename. (override: 
+          boolean true/false)
+        </li>
+        <li>
+          <b>Output single message (array)?</b> [single] checkbox. If selected, only one msg will be 
+          sent; the msg.payload will contain an array of file/folder names.<br />
+          Otherwise, the default output is a single msg for each file/folder found with
+          the msg.payload a string containing the filename. (override: boolean true/false)
+        </li>
+        <li>
+          <b>Max. search Depth</b> [depth] Integer. Default 0 only searches the start folder.
+          Limits the depth of sub-folders that will be searched (Maximum 10). (override: integer <= 10)
+        </li>
+       <li>
+          <b>Return file details?</b> [stat] Checkbox. If selected, msg.payload will contain an 
+          array of objects, each containing the name of the file/folder and status Information
+          about it. (override: boolean true/false)
+        </li>
+      </ul>
+      <p>
+        To override the configured options, pass in a msg with msg.payload like:
+        <code>{"start":"/my/folder","pattern":"*.json","folders":"!context"}</code>
+        Any missing options will be picked up from the configured node. 
+      </p>
+  </script>
