@@ -3,16 +3,10 @@
 	<h2>
 		Filing System Utilities: File Lister
 	</h2>
-	<h3>To Do</h3>
-	<ul>
-		<li>
-			Allow other overrides to be passed in.
-		</li>
-	</ul>
 	<h3>What does this node do?</h3>
 	<p>
 		This node searches a folder (and optionally sub-folders) for files. optionally
-		may filter on a specific file pattern.
+		may filter on a specific file and/or folder pattern.
 	</p>
 	<p>
 		The folder and files come from the computer and operating system that is
@@ -54,29 +48,43 @@
 			Max length is 1024
 		</li>
 		<li>
-			<b>Search sub-folders</b> Checkbox. If selected, sub-folders under the
-			start folder will also be searched.
+			<b>Folder Pattern</b> [folders] String that will be matched against folder names.
+			Standard "glob" file patterns are allowed. Defaults to '*' which will match all 
+			folders. Use the '!' to negate a folder - i.e. '!bin' means don't search the 'bin' 
+			folder. Multiple patterns can be used so "*,!bin,!data" means 'search all subfolders 
+			except 'bin' and 'data'. Max length is 1024
 		</li>
 		<li>
-			<b>Sub-folder Depth</b> Integer. Default 0 only searches the start folder.
-			Limits the depth of sub-folders that will be searched.
+			<b>Files/Folder/b> [lstype] Drop down that allows you to choice to return just files,
+			'folders or both
+		</li>
+		<li>
+			<b>Include hidden file/folders in output</b> Checkbox. If selected, hidden files 
+			and folders will processed.
 		</li>
 		<li>
 			<b>Include full path in output</b> Checkbox. If selected (the default),
 			the output payload will have the folder path prepended to the filename.
 		</li>
 		<li>
-			<b>Single</b> Checkbox. If selected, only one msg will be sent; the
-			msg.payload will contain an array of filenames.<br />
+			<b>Output single message (array)</b> Checkbox. If selected, only one msg will be 
+			sent; the msg.payload will contain an array of filenames.<br />
 			Otherwise, the default output is a single msg for each file found with
 			the msg.payload a string containing the filename.
+		</li>
+		<li>
+			<b>Max. search depth</b> Integer. Default 0 only searches the start folder.
+			Limits the depth of sub-folders that will be searched.
+		</li>
+		<li>
+			<b>Return file details</b> Checkbox. If selected, details of the files will be
+			returned as part of msg.payload
 		</li>
 	</ul>
 	<p>
 		To override the configured options, pass in a msg with msg.payload like:
 		<code>{"start":"/my/folder","pattern":"*.json"}</code>
-		Any missing options will be picked up from the configured node. Only those 2
-		overrides are currently available.
+		Any missing options will be picked up from the configured node.
 	</p>
 </body>
 </html>
