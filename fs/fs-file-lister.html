@@ -48,9 +48,7 @@
     },
     oneditprepare: function () {
         this.filter = this.filter || "oops"
-//        if ( this.lstype === undefined ) this.lstype = "Files"
-        if ( this.lstype === undefined ) this.lstype = "files"
-        $('#node-input-lstype').prop('Files', this.lstype)
+        $('#node-input-lstype').val(this.lstype || 'Files')
         if ( this.hidden === undefined ) this.hidden = true
         //#region Set the checkbox states
         $('#node-input-hidden').prop('checked', this.hidden)
