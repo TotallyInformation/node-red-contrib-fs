@@ -47,9 +47,8 @@
         return this.name ? 'node_label_italic' : '';
     },
     oneditprepare: function () {
-        this.filter = this.filter || "oops"
-        if ( this.lstype === undefined ) this.lstype = "Files"
-        $('#node-input-lstype').val(this.lstype || 'Files')
+        // handle new option 'list type'
+        if ( this.lstype === undefined ) this.lstype = "files"
         if ( this.hidden === undefined ) this.hidden = true
         //#region Set the checkbox states
         $('#node-input-hidden').prop('checked', this.hidden)
@@ -58,8 +57,6 @@
         $('#node-input-stat').prop('checked', this.stat)
         //#endregion checkbox states
     },
-    
-    labellstype: {value: 'files'}
   })
 </script>
 
