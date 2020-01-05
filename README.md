@@ -36,10 +36,11 @@ To install a development version, use:
    - Remove spurious `console.log(file)`
    - Remove input `_msgid` from output so that all output messages get their own _msgid (Fixes [Issue #11](https://github.com/TotallyInformation/node-red-contrib-fs/issues/11))
    - Update dependencies to latest
-- 1.1.2 - new functionality
+- 1.1.2 - new functionality(\*)
    - Folder pattern matching added
    - Search for files, folders or both added
-   - all options now set able the incoming msg 
+   - all options now set able the incoming msg
+   - (\*) because of the new functionality, existing nodes may see more results returned
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
 
