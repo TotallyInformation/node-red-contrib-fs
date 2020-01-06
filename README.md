@@ -2,7 +2,8 @@
 [Node-Red](http://nodered.org) nodes that work with the host filing system.
 
 # Nodes
-- [file-lister](docs/file-lister.html) - List all files in a given starting folder optionally with a filename filter pattern. Also has options for file details and sub-folder recursion.
+- [file-lister](docs/file-lister.html) - List all files and/or folders from a given starting folder based on the search
+option chosen. File and folder names allow filtering patterns. Also has options for file details and sub-folder recursion.
 - file-copier - In progress. Simple node to copy files (optionally with wildcard specifications).
 
 # Install
@@ -35,7 +36,11 @@ To install a development version, use:
    - Remove spurious `console.log(file)`
    - Remove input `_msgid` from output so that all output messages get their own _msgid (Fixes [Issue #11](https://github.com/TotallyInformation/node-red-contrib-fs/issues/11))
    - Update dependencies to latest
-
+- 1.1.2 - new functionality(\*)
+   - Folder pattern matching added
+   - Search for files, folders or both added
+   - all options now set able the incoming msg
+   - (\*) because of the new functionality, existing nodes may see more results returned
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
 

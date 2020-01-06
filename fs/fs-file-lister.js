@@ -39,12 +39,17 @@ module.exports = function(RED) {
         node.name     = config.name
         node.start    = config.start
         node.pattern  = config.pattern
-        node.lstype   = config.lstype || 'files'              /** @since v1.0.2 */
-        node.hidden   = config.hidden !== undefined ? config.hidden : true  /** @since v1.0.2 */
+        node.folders  = config.folders !== undefined ? config.folders : "*"
+        node.lstype   = config.lstype  !== undefined ? config.lstype : "files"
+        node.hidden   = config.hidden  !== undefined ? config.hidden : true  /** @since v1.0.2 */
         node.path     = config.path
         node.single   = config.single
-        node.depth    = config.depth
+        node.depth    = config.depth   
         node.stat     = config.stat
+                
+		if ( (node.pattern == "") || (node.pattern == "*") ) node.pattern = "*.*"
+		if  (node.folders == "") node.folders = "*"
+
 
         // Make sure the parameters are strings
         if ( (typeof node.start !== 'string') || (typeof node.pattern !== 'string') ) {
@@ -56,22 +61,71 @@ module.exports = function(RED) {
         /** @since v1.0.1, amended ready for Node-RED v1 */
         node.on('input', function(msg, send, done) {
 
-            // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
+          // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
             send = send || function() { node.send.apply(node,arguments) }
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
             done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
 
-            // override config if passed suitable payload
+		// ---------------------------------------------------------
+ 		// this section handles the overriding 'config' if option coming in msg.payload
+ 		// ---------------------------------------------------------
+            // override 'start if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
                 if ( validFolderName(msg.payload.start) ) {
                     node.start = msg.payload.start
-                }
+               }
             }
+            // override file 'pattern' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
                 if ( (typeof msg.payload.pattern === 'string') && (msg.payload.pattern.length < 1024) ) {
                     node.pattern = msg.payload.pattern
                 }
             }
+            // override 'folders' pattern if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('folders' in msg.payload) ) {
+                if ( (typeof msg.payload.folders === 'string') && (msg.payload.folders.length < 1024) ) {
+                    node.folders = msg.payload.folders
+                }
+            }
+            // override 'lstype' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('lstype' in msg.payload) ) {
+                if ( (typeof msg.payload.lstype === 'string') && (msg.payload.lstype.length < 50) ) {
+                    node.lstype = msg.payload.lstype.toLowerCase()
+                }
+            }
+            // override 'hidden' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('hidden' in msg.payload) ) {
+                if ( (typeof msg.payload.hidden === 'boolean')  ) {
+                    node.hidden = msg.payload.hidden
+                }
+            }
+            // override 'path' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('path' in msg.payload) ) {
+                if ( (typeof msg.payload.path === 'boolean')  ) {
+                    node.path = msg.payload.path
+                }
+            }
+            // override 'single' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('single' in msg.payload) ) {
+                if ( (typeof msg.payload.single === 'boolean')  ) {
+                    node.single = msg.payload.single
+                }
+            }
+            // override 'depth' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('depth' in msg.payload) ) {
+                if ( (typeof msg.payload.depth === 'number') && (msg.payload.depth < 11) ) {
+                    node.depth = msg.payload.depth
+                }
+            }
+            // override 'stat' if passed suitable payload
+            if ( (typeof msg.payload === 'object') && ('stat' in msg.payload) ) {
+                if ( (typeof msg.payload.stat === 'boolean')  ) {
+                    node.stat = msg.payload.stat
+                }
+            }
+            
+            if (node.lstype == 'folders') {node.lstype = 'directories'}
+            if (node.lstype == 'both') {node.lstype = 'files_directories'}
 
             var clonedMsg = RED.util.cloneMessage(msg)
             // Remove original _msgid
@@ -80,7 +134,8 @@ module.exports = function(RED) {
             clonedMsg.config = {
                 'start': node.start,
                 'pattern': node.pattern,
-                'type': node.type, /** @since v1.0.2 */
+                'folders': node.folders,
+                'lstype': node.lstype, 
                 'hidden': node.hidden, /** @since v1.0.2 */
                 'path': node.path,
                 'single': node.single,
@@ -92,9 +147,9 @@ module.exports = function(RED) {
             var totalFiles = 0
 
             var options = {}
-            options.fileFilter = node.pattern
-            options.directoryFilter = node.pattern
+	    
             options.type = node.lstype
+            	
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
             }
@@ -102,15 +157,28 @@ module.exports = function(RED) {
             /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
              * NB: doesn't help with Windows hidden files/folders
              **/
-            if ( node.hidden === true ) {
+            node.pattern = node.pattern.replace(/ /g,"")
+             if ( node.hidden === true ) {
                 // No need for this if supplied patter starts with a dot
                 if (node.pattern.charAt(0) !== '.') {
-                    options.fileFilter = [node.pattern, `.${node.pattern}`]
-                    options.directoryFilter = [node.pattern, `.${node.pattern}`]
+                    var np = node.pattern.replace(/,/g,",.")
+                    node.pattern = node.pattern +",."+np
+                }
+                if (node.folders.charAt(0) !== '.') {
+                    var nf = node.folders.replace(/,/g,",.")
+                    node.folders = node.folders +",."+nf
                 }
             }
 
-            var arrayOut = []
+	    // change shashes (/) to commas (,) then get rid of extra spaces
+            node.folders = node.folders.replace(/\//g,",")
+            node.folders = node.folders.replace(/ /g,"")
+            
+	    // split the file and directory options into arrays arguments for 'readdirp'
+            options.fileFilter = node.pattern.split(',')
+            options.directoryFilter = node.folders.split(',')
+
+            var arrayOut = []          
 
             // Recursively read the folder using the stream API
             // @ts-ignore
