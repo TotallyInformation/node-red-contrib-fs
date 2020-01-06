@@ -22,6 +22,7 @@ To install a development version, use:
 - 0.0.9 - Initial release - File lister. 2016-06-14
 - 1.0.0 - Reworked File lister, more options. 2016-06-14
 - 1.0.1 - Fix from [Andreas Brain](https://github.com/abrain) correcting URLs in package.json. 2016-06-22
+
 - 1.1.0 - 2019-09-22
    - PR from [juggledad](https://github.com/juggledad) (amended) adds option to exclude files/folders that start with a dot (e.g. hidden)
    - Fix from [Lena Derksen](https://github.com/boisei0) fixes [Issue #9](https://github.com/TotallyInformation/node-red-contrib-fs/issues/9) by sending new messages rather than overwriting the incoming message on every send.
@@ -29,6 +30,7 @@ To install a development version, use:
    - If root folder is empty, return an empty array or a warning payload (based suggestion from [jpmalich](https://github.com/jpmalich))
    - Fixed file stat output - `created` was reporting incorrect date/time except on Windows. `statusChanged` datetime now added - see [Node.js docs](https://nodejs.org/api/fs.html#fs_stat_time_values) for details.
    - Plus other minor updates/fixes.
+   
 - 1.1.1 - Bug fixes and tidy
    - Add GitHub templates
    - Minor tidy of main code
@@ -36,11 +38,13 @@ To install a development version, use:
    - Remove spurious `console.log(file)`
    - Remove input `_msgid` from output so that all output messages get their own _msgid (Fixes [Issue #11](https://github.com/TotallyInformation/node-red-contrib-fs/issues/11))
    - Update dependencies to latest
-- 1.1.2 - new functionality(\*)
+   
+- 1.2.0 - 2020-01-06 new functionality(\*)
    - Folder pattern matching added
    - Search for files, folders or both added
    - all options now set able the incoming msg
    - (\*) because of the new functionality, existing nodes may see more results returned
+  
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
 
