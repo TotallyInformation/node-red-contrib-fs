@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019 Julian Knight (Totally Information)
+ * Copyright (c) 2020 Julian Knight (Totally Information)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ module.exports = function(RED) {
         node.name     = config.name
         node.start    = config.start
         node.pattern  = config.pattern
-        node.folders  = config.folders !== undefined ? config.folders : "*"
-        node.lstype   = config.lstype  !== undefined ? config.lstype : "files"
+        node.folders  = config.folders !== undefined ? config.folders : '*'
+        node.lstype   = config.lstype  !== undefined ? config.lstype : 'files'
         node.hidden   = config.hidden  !== undefined ? config.hidden : true  /** @since v1.0.2 */
         node.path     = config.path
         node.single   = config.single
         node.depth    = config.depth   
         node.stat     = config.stat
                 
-		if ( (node.pattern == "") || (node.pattern == "*") ) node.pattern = "*.*"
-		if  (node.folders == "") node.folders = "*"
+        if ( (node.pattern == '') || (node.pattern == '*') ) node.pattern = '*.*'
+        if  (node.folders == '') node.folders = '*'
 
 
         // Make sure the parameters are strings
@@ -61,19 +61,19 @@ module.exports = function(RED) {
         /** @since v1.0.1, amended ready for Node-RED v1 */
         node.on('input', function(msg, send, done) {
 
-          // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
+            // If this is pre-1.0, 'send' will be undefined, so fallback to node.send
             send = send || function() { node.send.apply(node,arguments) }
             // If this is pre-1.0, 'done' will be undefined, so fallback to dummy function
             done = done || function() { if (arguments.length>0) node.error.apply(node,arguments) }
 
-		// ---------------------------------------------------------
- 		// this section handles the overriding 'config' if option coming in msg.payload
- 		// ---------------------------------------------------------
+            // ---------------------------------------------------------
+            // this section handles the overriding 'config' if option coming in msg.payload
+            // ---------------------------------------------------------
             // override 'start if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('start' in msg.payload) ) {
                 if ( validFolderName(msg.payload.start) ) {
                     node.start = msg.payload.start
-               }
+                }
             }
             // override file 'pattern' if passed suitable payload
             if ( (typeof msg.payload === 'object') && ('pattern' in msg.payload) ) {
@@ -147,9 +147,9 @@ module.exports = function(RED) {
             var totalFiles = 0
 
             var options = {}
-	    
+
             options.type = node.lstype
-            	
+	
             if ( node.depth > -1 ) {
                 options.depth = Number(node.depth)
             }
@@ -157,24 +157,24 @@ module.exports = function(RED) {
             /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
              * NB: doesn't help with Windows hidden files/folders
              **/
-            node.pattern = node.pattern.replace(/ /g,"")
-             if ( node.hidden === true ) {
+            node.pattern = node.pattern.replace(/ /g,'')
+            if ( node.hidden === true ) {
                 // No need for this if supplied patter starts with a dot
                 if (node.pattern.charAt(0) !== '.') {
-                    var np = node.pattern.replace(/,/g,",.")
-                    node.pattern = node.pattern +",."+np
+                    var np = node.pattern.replace(/,/g, ',.')
+                    node.pattern = node.pattern + ',.' + np
                 }
                 if (node.folders.charAt(0) !== '.') {
-                    var nf = node.folders.replace(/,/g,",.")
-                    node.folders = node.folders +",."+nf
+                    var nf = node.folders.replace(/,/g, ',.')
+                    node.folders = node.folders + ',.' + nf
                 }
             }
 
-	    // change shashes (/) to commas (,) then get rid of extra spaces
-            node.folders = node.folders.replace(/\//g,",")
-            node.folders = node.folders.replace(/ /g,"")
+            // change shashes (/) to commas (,) then get rid of extra spaces
+            node.folders = node.folders.replace(/\//g, ',')
+            node.folders = node.folders.replace(/ /g, '')
             
-	    // split the file and directory options into arrays arguments for 'readdirp'
+            // split the file and directory options into arrays arguments for 'readdirp'
             options.fileFilter = node.pattern.split(',')
             options.directoryFilter = node.folders.split(',')
 
