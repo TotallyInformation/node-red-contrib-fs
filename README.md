@@ -44,7 +44,12 @@ To install a development version, use:
    - Search for files, folders or both added
    - all options now set able the incoming msg
    - (\*) because of the new functionality, existing nodes may see more results returned
-  
+
+- 1.3.0 - 2020-01-13 new functionality(\*)
+   - Fix memory leak
+   - Add configuration option to turn off output warnings - these can be excessive as they include "cannot access" general warnings (permissions).
+   - Code tidy
+
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
 
