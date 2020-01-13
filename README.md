@@ -45,8 +45,8 @@ To install a development version, use:
    - all options now set able the incoming msg
    - (\*) because of the new functionality, existing nodes may see more results returned
 
-- 1.3.0 - 2020-01-13 new functionality(\*)
-   - Fix memory leak
+- 1.3.1 - 2020-01-13 new functionality(\*)
+   - Fix memory leak [Issue #18](https://github.com/TotallyInformation/node-red-contrib-fs/issues/18) - thanks to Colin for reporting.
    - Add configuration option to turn off output warnings - these can be excessive as they include "cannot access" general warnings (permissions).
    - Code tidy
 
