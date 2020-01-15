@@ -45,10 +45,13 @@ To install a development version, use:
    - all options now set able the incoming msg
    - (\*) because of the new functionality, existing nodes may see more results returned
 
-- 1.3.1 - 2020-01-13 new functionality(\*)
+- 1.3.1 - 2020-01-13 new functionality & bug fix
    - Fix memory leak [Issue #18](https://github.com/TotallyInformation/node-red-contrib-fs/issues/18) - thanks to Colin for reporting.
    - Add configuration option to turn off output warnings - these can be excessive as they include "cannot access" general warnings (permissions).
    - Code tidy
+
+- 1.3.2 - 2020-01-15 Bug Fix
+   - Fix inability to pass in start folder via msg [Issue #19](https://github.com/TotallyInformation/node-red-contrib-fs/issues/19) - thanks to Paul for reporting.
 
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)

@@ -195,7 +195,7 @@ module.exports = function(RED) {
 
             // Recursively read the folder using the stream API
             // @ts-ignore
-            readdirp(path.join(node.start), options)
+            readdirp(path.join(clonedMsg.config.start), options)
                 // Called if a found entry cannot be accessed (e.g. permissions)
                 .on('warn', (err) => {
                     if ( node.showWarnings === true ) node.warn('File could not be accessed', err)
