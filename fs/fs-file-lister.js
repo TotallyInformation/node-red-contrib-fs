@@ -233,7 +233,14 @@ module.exports = function(RED) {
                                 statusChanged: entry.stats.ctime, // @since v1.1.0
                                 uid: Number(entry.stats.uid),
                                 gid: Number(entry.stats.gid),
-                                mode: '0x' + entry.stats.mode.toString(16)
+                                mode: '0x' + entry.stats.mode.toString(16),
+                                isBlockDevice: entry.stats.isBlockDevice(),
+                                isCharacterDevice: entry.stats.isCharacterDevice(),
+                                isDirectory: entry.stats.isDirectory(),
+                                isFIFO: entry.stats.isFIFO(),
+                                isFile: entry.stats.isFile(),
+                                isSocket: entry.stats.isSocket(),
+                                isSymbolicLink: entry.stats.isSymbolicLink(),
                             }
                         } catch (err) {
                             file.stat = {'error': 'Cannot stat file', 'err': err}

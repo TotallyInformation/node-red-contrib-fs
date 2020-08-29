@@ -54,8 +54,13 @@ To install a development version, use:
    - Fix inability to pass in start folder via msg [Issue #19](https://github.com/TotallyInformation/node-red-contrib-fs/issues/19) - thanks to Paul for reporting.
 
 - 1.3.3 - 2020-08-29 Bug Fix
-   - Fix overrid of hidden flag not working [Issue #20](https://github.com/TotallyInformation/node-red-contrib-fs/issues/20) - thanks to Paul for reporting.
+   - Fix override of hidden flag not working [Issue #20](https://github.com/TotallyInformation/node-red-contrib-fs/issues/20) - thanks to Paul for reporting.
    - Update dependencies
+
+- 1.4.0 - 2020-08-29 Additional file details added
+   - Added the following flags to the `stat` object which is included if the "file details" flag is set:
+
+     isBlockDevice, isCharacterDevice, isDirectory, isFIFO, isFile, isSocket, isSymbolicLink
 
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
