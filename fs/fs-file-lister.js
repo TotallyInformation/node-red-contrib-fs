@@ -71,20 +71,6 @@ module.exports = function(RED) {
             return
         }
 
-        /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
-         * NB: doesn't help with Windows hidden files/folders
-         **/
-        node.pattern = node.pattern.replace(/ /g,'')
-        if ( node.hidden === true ) {
-            // No need for this if supplied patter starts with a dot
-            if (node.pattern.charAt(0) !== '.') {
-                node.pattern = node.pattern + ',.' + node.pattern.replace(/,/g, ',.')
-            }
-            if (node.folders.charAt(0) !== '.') {
-                node.folders = node.folders + ',.' + node.folders.replace(/,/g, ',.')
-            }
-        }
-
         // change shashes (/) to commas (,) then get rid of extra spaces
         node.folders = node.folders.replace(/\//g, ',')
         node.folders = node.folders.replace(/ /g, '')
@@ -187,9 +173,26 @@ module.exports = function(RED) {
             }
             if ( clonedMsg.config.stat ) options.alwaysStat = true
             
+            /** Show hidden files/folders? Unless explicitly asked for, readdirp will ignore them
+             * NB: doesn't help with Windows hidden files/folders
+             * @since v1.3.3, moved to fix Issue #20
+             **/
+            //node.pattern = node.pattern.replace(/ /g,'')
+            if ( clonedMsg.config.hidden === true ) {
+                // No need for this if supplied patter starts with a dot
+                if (clonedMsg.config.pattern.charAt(0) !== '.') {
+                    clonedMsg.config.pattern = clonedMsg.config.pattern + ',.' + clonedMsg.config.pattern.replace(/,/g, ',.')
+                }
+                if (clonedMsg.config.folders.charAt(0) !== '.') {
+                    clonedMsg.config.folders = clonedMsg.config.folders + ',.' + clonedMsg.config.folders.replace(/,/g, ',.')
+                }
+            }
+
             // split the file and directory options into arrays arguments for 'readdirp'
             options.fileFilter = clonedMsg.config.pattern.split(',')
             options.directoryFilter = clonedMsg.config.folders.split(',')
+
+            console.log('*******', options)
 
             let arrayOut = []
 

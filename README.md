@@ -53,6 +53,10 @@ To install a development version, use:
 - 1.3.2 - 2020-01-15 Bug Fix
    - Fix inability to pass in start folder via msg [Issue #19](https://github.com/TotallyInformation/node-red-contrib-fs/issues/19) - thanks to Paul for reporting.
 
+- 1.3.3 - 2020-08-29 Bug Fix
+   - Fix overrid of hidden flag not working [Issue #20](https://github.com/TotallyInformation/node-red-contrib-fs/issues/20) - thanks to Paul for reporting.
+   - Update dependencies
+
 # Depends On
 - [readdirp](https://github.com/paulmillr/readdirp)
 

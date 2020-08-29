@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-fs",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Node-Red Node that handles the host filing system.",
   "scripts": {
     "npmtags": "npm dist-tag ls node-red-contrib-uibuilder",
@@ -10,7 +10,7 @@
     "gitpushtags": "git push origin --tags"
   },
   "dependencies": {
-    "readdirp": "^3.3.0"
+    "readdirp": "^3.4.0"
   },
   "author": {
     "name": "Julian Knight",
