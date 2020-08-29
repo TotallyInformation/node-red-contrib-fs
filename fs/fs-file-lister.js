@@ -192,8 +192,6 @@ module.exports = function(RED) {
             options.fileFilter = clonedMsg.config.pattern.split(',')
             options.directoryFilter = clonedMsg.config.folders.split(',')
 
-            console.log('*******', options)
-
             let arrayOut = []
 
             // Recursively read the folder using the stream API

@@ -57,7 +57,7 @@ To install a development version, use:
    - Fix override of hidden flag not working [Issue #20](https://github.com/TotallyInformation/node-red-contrib-fs/issues/20) - thanks to Paul for reporting.
    - Update dependencies
 
-- 1.4.0 - 2020-08-29 Additional file details added
+- 1.4.1 - 2020-08-29 Additional file details added
    - Added the following flags to the `stat` object which is included if the "file details" flag is set:
 
      isBlockDevice, isCharacterDevice, isDirectory, isFIFO, isFile, isSocket, isSymbolicLink
