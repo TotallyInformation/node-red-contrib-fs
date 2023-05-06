@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-fs",
-  "version": "1.4.1-zeldalegends",
+  "version": "1.4.2",
   "description": "Node-Red Node that handles the host filing system.",
   "scripts": {
     "npmtags": "npm dist-tag ls node-red-contrib-uibuilder",
