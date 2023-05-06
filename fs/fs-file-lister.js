@@ -61,7 +61,7 @@ module.exports = function(RED) {
         node.stat     = config.stat
         node.showWarnings = config.showWarnings !== undefined ? config.showWarnings : true
                 
-        if ( (node.pattern == '') || (node.pattern == '*') ) node.pattern = '*.*'
+        if  (node.pattern == '') node.pattern = '*'
         if  (node.folders == '') node.folders = '*'
 
 
